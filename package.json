@@ -15,12 +15,13 @@
     "gulp-sourcemaps": "^1.6.0",
     "gulp-concat": "^2.6.0",
     "gulp-uglify": "^1.4.2",
+    "gulp-jasmine": "^2.1.0",
     "tsd": "^0.6.5",
     "jasmine": "^2.3.0",
     "three": "^0.71.0"
   },
   "scripts": {
-    "postinstall": "./node_modules/.bin/tsd install jasmine three"
+    "postinstall": "./node_modules/.bin/tsd install"
   },
   "private": true
 }

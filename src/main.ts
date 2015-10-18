@@ -9,7 +9,7 @@
 
 /// <reference path="game.ts" />
 
-window.addEventListener("load", () => { console.log("1");
+window.addEventListener("load", () => {
   var g = new Game();
   g.actionFrame();
 });

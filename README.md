@@ -9,12 +9,10 @@ Build:
 
 ```
 gulp
-gulp min
 ```
 
 Unit test:
 
 ```
-tsc -p spec/
-jasmine
+gulp test
 ```
