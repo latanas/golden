@@ -1,0 +1,26 @@
+{
+  "name": "golden",
+  "version": "0.0.1",
+  "description": "Guide the dragon.",
+  "repository": "https://github.com/latanas/golden.git",
+
+  "homepage": "http://www.laskov.co.uk/golden/",
+  "author": "Atanas Laskov <latanas@gmail.com>",
+  "license": "BSD-2-Clause",
+
+  "dependencies": {
+    "typescript": "^1.6.2",
+    "gulp": "^3.9.0",
+    "gulp-typescript": "^2.9.2",
+    "gulp-sourcemaps": "^1.6.0",
+    "gulp-concat": "^2.6.0",
+    "gulp-uglify": "^1.4.2",
+    "tsd": "^0.6.5",
+    "jasmine": "^2.3.0",
+    "three": "^0.71.0"
+  },
+  "scripts": {
+    "postinstall": "./node_modules/.bin/tsd install jasmine three"
+  },
+  "private": true
+}
