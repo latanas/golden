@@ -1,22 +1,33 @@
 
-Install dependencies:
+#### Install dependencies:
 
 ```
 npm install
 ```
 
-The package tsd only looks for "node" and not "nodejs",
-so you may need to "ln -s /usr/bin/nodejs /usr/bin/node".
+You may need to do "ln -s /usr/bin/nodejs /usr/bin/node",
+because the package tsd only looks for "node" and not "nodejs".
 
-Build:
+#### Build:
 
 ```
 source ./golden.sh
 gulp
 ```
 
-Unit test:
+#### Unit test:
 
 ```
 gulp test
 ```
+
+#### Run:
+http://www.atanaslaskov.com/golden/
+
+Run locally:
+
+```
+python3 -m http.server
+```
+
+Then you can play at localhost:8000.
