@@ -6,6 +6,8 @@
 
   http://www.atanaslaskov.com/arena/
 */
+
+/// <reference path="../typings/jasmine/jasmine.d.ts" />
 /// <reference path="../src/vector.ts" />
 
 describe("Vector", () => {
@@ -20,9 +22,19 @@ describe("Vector", () => {
     var v1:Vector = new Vector(0.3, 0.4);
     var v2:Vector = v1.copy();
 
-    expect(v2).not.toBe(v1); // (v2 should be a new instance)
+    expect(v2).not.toBe(v1); // It should be a new instance
     expect(v2.x).toEqual(0.3);
     expect(v2.y).toEqual(0.4)
+  });
+
+  it("should set the coordinates of the vector", () => {
+    var v1:Vector = new Vector(0.1, 0.2);
+    var v2:Vector = new Vector(0.3, 0.4);
+
+    v2.set( v1 );
+
+    expect(v2.x).toEqual(0.1);
+    expect(v2.y).toEqual(0.2);
   });
 
   it("should calculate 2D distance", () => {

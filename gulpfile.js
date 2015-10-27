@@ -9,9 +9,10 @@
 var gulp = require('gulp');
 var ts = require('gulp-typescript');
 var sourcemaps = require('gulp-sourcemaps');
-var jasmine = require('gulp-jasmine');
 var concat = require('gulp-concat');
 var uglify = require('gulp-uglify');
+
+var KarmaServer = require('karma').Server;
 
 // Compile TypeScript and generate source map
 //
@@ -34,7 +35,7 @@ gulp.task("default", ["compile", "lib"]);
 
 // Run unit tests
 //
-gulp.task('test', function() {
+gulp.task('test-compile', function() {
   return gulp.src([
       "typings/jasmine/jasmine.d.ts",
       "spec/support/utils.ts",
@@ -43,8 +44,16 @@ gulp.task('test', function() {
     .pipe( sourcemaps.init() )
     .pipe( ts({"out": "spec.js"}) ).js
     .pipe( sourcemaps.write() )
-    .pipe( gulp.dest("spec/build") )
-    .pipe( jasmine() );
+    .pipe( gulp.dest("spec/build") );
+
+    return merge(gameSource, gameTestSuite);
+});
+
+gulp.task('test', ['test-compile'], function( done ) {
+  new KarmaServer({
+    configFile: __dirname + '/spec/karma.conf.js',
+    singleRun: true
+  }, done).start();
 });
 
 // Minify the build

@@ -9,16 +9,35 @@
 
 /// <reference path="vector.ts" />
 /// <reference path="clock.ts" />
+/// <reference path="renderer.ts" />
 
-// Game initializes and manages dynamic objects
+/// <reference path="game_object.ts" />
+/// <reference path="apple.ts" />
+
+// Game manages the dynamic objects
 //
-class Game{
+class Game {
+  private renderer: Renderer;
   private clock: Clock;
   private isPaused: boolean;
 
-  constructor() {
+  private objects: GameObject[];
+  private clickTarget: Vector;
+
+  constructor( renderer: Renderer ) {
+    this.renderer = renderer;
     this.clock    = new Clock();
     this.isPaused = false;
+
+    this.objects = [
+      new Apple( renderer )
+    ];
+
+    this.clickTarget = new Vector();
+
+    window.addEventListener('click', (e) => {
+      this.clickTarget = renderer.unproject( new Vector(e.clientX, e.clientY) );
+    });
   }
 
   // Single action frame of the game
@@ -36,10 +55,15 @@ class Game{
   // Make a picture
   //
   private render() {
+    this.renderer.render();
   }
 
   // Make things move
   //
-  private animate(dt: number) {
+  private animate( dt: number ) {
+    for( var i=0; i<this.objects.length; i++ ) {
+      this.objects[i].animate(dt);
+    }
+    this.objects[0].position = this.clickTarget;
   }
 }

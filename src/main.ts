@@ -8,8 +8,9 @@
 */
 
 /// <reference path="game.ts" />
+/// <reference path="renderer.ts" />
 
 window.addEventListener("load", () => {
-  var g = new Game();
+  var g = new Game( new ThreeRenderer() );
   g.actionFrame();
 });

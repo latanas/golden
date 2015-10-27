@@ -18,11 +18,16 @@ class Vector{
     this.y = y;
   }
 
+  public set(v: Vector) {
+    this.x = v.x;
+    this.y = v.y;
+  }
+
   public copy(): Vector {
     return new Vector(this.x, this.y);
   }
 
-  public distance(): number {
+ public distance(): number {
     return Math.sqrt( this.x*this.x + this.y*this.y );
   }
 

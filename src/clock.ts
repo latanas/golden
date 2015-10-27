@@ -14,20 +14,27 @@ class Clock{
   public dt:    number; // Time delta
   public fps:   number; // Frames per second
 
+  private timeService: ()=> number;
   private fpsUpdateTime: number;
+  private fpsElement: any;
 
-  constructor() {
-    this.clock = window.performance.now();
+  constructor( timeService: ()=>number = ()=> { return window.performance.now(); } ) {
+    this.timeService = timeService;
+    this.clock = this.timeService();
+
+    this.fps = 60.0;
+    this.dt  = 1.0/60.0;
     this.fpsUpdateTime = 0;
 
     // Reset clock when focus returns to the game window, or an FPS glitch will occur
     window.addEventListener("focus", () => {
-      this.clock = window.performance.now();
+      this.clock = this.timeService();
     });
+    this.fpsElement = document.getElementById("fps");
   }
 
   public tick() {
-    var t = window.performance.now();
+    var t = this.timeService();
     this.dt = (t - this.clock) * 0.001; // Sec
 
     if( this.dt <= 0 ) {
@@ -40,9 +47,9 @@ class Clock{
     //
     this.fpsUpdateTime -= this.dt;
 
-    if( this.fpsUpdateTime <= 0 ) {
+    if( this.fpsElement && (this.fpsUpdateTime <= 0) ) {
       this.fpsUpdateTime = 0.5;
-      document.getElementById("fps").innerHTML = "Frame Rate: " + Math.round(this.fps) + "fps";
+      this.fpsElement.innerHTML = "Frame Rate: " + Math.round(this.fps) + "fps";
     }
 
     // Return the time difference, because it is what we need for animation

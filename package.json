@@ -10,15 +10,16 @@
 
   "dependencies": {
     "typescript": "^1.6.2",
+    "tsd": "^0.6.5",
+    "three": "^0.71.0",
     "gulp": "^3.9.0",
     "gulp-typescript": "^2.9.2",
     "gulp-sourcemaps": "^1.6.0",
     "gulp-concat": "^2.6.0",
     "gulp-uglify": "^1.4.2",
-    "gulp-jasmine": "^2.1.0",
-    "tsd": "^0.6.5",
-    "jasmine": "^2.3.0",
-    "three": "^0.71.0"
+    "karma": "^0.13.14",
+    "karma-jasmine": "^0.1.6",
+    "karma-chrome-launcher": "^0.2.1"
   },
   "scripts": {
     "postinstall": "./node_modules/.bin/tsd install"
