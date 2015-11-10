@@ -13,9 +13,9 @@
 
 // Apple consumed by the player's dragon
 //
-class Apple implements GameObject {
-  public position: Vector;
-  public velocity: Vector;
+class GameObjectApple implements GameObject {
+  private position: Vector;
+  private velocity: Vector;
 
   private renderer: Renderer;
   private renderPosition: Vector;
@@ -31,7 +31,7 @@ class Apple implements GameObject {
     this.swing = 0.0;
 
     this.renderer = renderer;
-    this.id = this.renderer.add( this.position );
+    this.id = this.renderer.add( RendererObjectType.MODEL, "apple.json", this.position );
   }
 
   // Animate the apple
@@ -44,6 +44,5 @@ class Apple implements GameObject {
     this.renderPosition.y += Math.sin( this.swing )*0.05;
 
     this.renderer.position( this.id, this.renderPosition );
-
   }
 }

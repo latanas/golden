@@ -13,8 +13,5 @@
 // Abstract game object
 //
 interface GameObject {
-  position: Vector;
-  velocity: Vector;
-
   animate( dt: number ): void;
 }

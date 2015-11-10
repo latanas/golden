@@ -27,7 +27,7 @@ class Vector{
     return new Vector(this.x, this.y);
   }
 
- public distance(): number {
+  public distance(): number {
     return Math.sqrt( this.x*this.x + this.y*this.y );
   }
 
@@ -41,5 +41,10 @@ class Vector{
 
   static scale(v: Vector, n: number) {
     return new Vector( v.x*n, v.y*n );
+  }
+
+  static norm(v: Vector) {
+    var d = v.distance();
+    return new Vector( v.x/d, v.y/d );
   }
 }

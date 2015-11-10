@@ -138,4 +138,20 @@ describe("Vector", () => {
     expect( limitPrecision(v.x) ).toEqual( 0.1 );
     expect( limitPrecision(v.y) ).toEqual( 0.2 );
   });
+  
+  it("should normalize vector", () => {
+    var v: Vector = null;
+
+    v = Vector.norm( new Vector(2.0, 0.0) );
+    expect( v.x ).toBeCloseTo( 1.0, 3 );
+    expect( v.y ).toBeCloseTo( 0.0, 3 );
+    
+    v = Vector.norm( new Vector(0.0, 2.0) );
+    expect( v.x ).toBeCloseTo( 0.0, 3 );
+    expect( v.y ).toBeCloseTo( 1.0, 3 );
+    
+    v = Vector.norm( new Vector(-0.5, +1.2) );
+    var d = v.distance();
+    expect( v.distance() ).toBeCloseTo( 1.0, 3 );
+  });
 });

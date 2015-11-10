@@ -12,7 +12,8 @@
 /// <reference path="renderer.ts" />
 
 /// <reference path="game_object.ts" />
-/// <reference path="apple.ts" />
+/// <reference path="game_object_apple.ts" />
+/// <reference path="game_object_dragon.ts" />
 
 // Game manages the dynamic objects
 //
@@ -22,7 +23,6 @@ class Game {
   private isPaused: boolean;
 
   private objects: GameObject[];
-  private clickTarget: Vector;
 
   constructor( renderer: Renderer ) {
     this.renderer = renderer;
@@ -30,14 +30,9 @@ class Game {
     this.isPaused = false;
 
     this.objects = [
-      new Apple( renderer )
+      new GameObjectApple( renderer ),
+      new GameObjectDragon( renderer, new Vector(0.0, 0.4) )
     ];
-
-    this.clickTarget = new Vector();
-
-    window.addEventListener('click', (e) => {
-      this.clickTarget = renderer.unproject( new Vector(e.clientX, e.clientY) );
-    });
   }
 
   // Single action frame of the game
@@ -64,6 +59,5 @@ class Game {
     for( var i=0; i<this.objects.length; i++ ) {
       this.objects[i].animate(dt);
     }
-    this.objects[0].position = this.clickTarget;
   }
 }
