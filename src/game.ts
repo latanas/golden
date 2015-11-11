@@ -30,7 +30,6 @@ class Game {
     this.isPaused = false;
 
     this.objects = [
-      new GameObjectApple( renderer ),
       new GameObjectDragon( renderer, new Vector(0.0, 0.4) )
     ];
   }

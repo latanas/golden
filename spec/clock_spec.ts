@@ -4,7 +4,7 @@
 
   License: BSD license, see LICENSE.md for more details.
 
-  http://www.atanaslaskov.com/arena/
+  http://www.atanaslaskov.com/golden/
 */
 
 /// <reference path="../typings/jasmine/jasmine.d.ts" />

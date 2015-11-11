@@ -31,6 +31,11 @@ class Vector{
     return Math.sqrt( this.x*this.x + this.y*this.y );
   }
 
+  public angle(): number {
+    var a: number = Math.atan2(this.y, this.x);
+    return a>=0 ? a : a + Math.PI*2;
+  }
+
   static plus(a: Vector, b: Vector): Vector {
     return new Vector( a.x+b.x, a.y+b.y );
   }
@@ -44,7 +49,7 @@ class Vector{
   }
 
   static norm(v: Vector) {
-    var d = v.distance();
+    var d: number = v.distance();
     return new Vector( v.x/d, v.y/d );
   }
 }
