@@ -41,7 +41,8 @@ class Trail {
       this.next.append();
     }
     else {
-     this.next = new Trail( this.renderer, this.size, this.position, this.velocity );
+     var pos = Vector.minus( this.position, Vector.scale(this.velocity, this.size) );
+     this.next = new Trail( this.renderer, this.size, pos, this.velocity );
     }
   }
 
