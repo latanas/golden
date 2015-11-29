@@ -24,7 +24,7 @@ interface Renderer {
 
   // Position an object
   position(id: number, position: Vector);
-  
+
   // Rotate an object
   rotation(id: number, angle: number)
 
@@ -45,7 +45,7 @@ class ThreeRenderer implements Renderer {
   private origin:  Vector;
 
   private renderer: THREE.WebGLRenderer;
-  private camera: THREE.Camera;
+  private camera: THREE.PerspectiveCamera;
   private scene: THREE.Scene;
 
   // Construct renderer
@@ -68,10 +68,14 @@ class ThreeRenderer implements Renderer {
     this.camera.position.z = 1;
 
     window.addEventListener('resize', (e) => {
-      c.width = this.width = window.innerWidth;
-      c.height = this.height = window.innerHeight;
-      this.scale = Math.min(this.width, this.height);
+      this.width  = c.width = window.innerWidth;
+      this.height = c.height = window.innerHeight;
+      this.scale  = Math.min(this.width, this.height);
       this.origin = new Vector(this.width/2.0, this.height/2.0);
+
+      this.camera.aspect = this.width/this.height;
+      this.camera.updateProjectionMatrix();
+      this.renderer.setSize(this.width, this.height);
     });
 
     var light1 = new THREE.DirectionalLight( 0xffffff, 0.8 );
@@ -87,18 +91,18 @@ class ThreeRenderer implements Renderer {
   //
   add(type: RendererObjectType, file: string, position: Vector): number {
     var obj = null;
-    
+
     if( type == RendererObjectType.SPRITE ) {
       var spriteMap = THREE.ImageUtils.loadTexture( "assets/" + file );
       var spriteMaterial = new THREE.MeshBasicMaterial( { color: 0xffffff, map: spriteMap, transparent: true} );
       var spriteGeometry = new THREE.PlaneGeometry( 1.0, 1.0, 1, 1 );
-      
+
       obj = new THREE.Mesh( spriteGeometry, spriteMaterial );
     }
     else if( type == RendererObjectType.MODEL ) {
       var modelGeometry = new THREE.SphereGeometry( 1.0, 32, 32 ); // TODO: Load model file
       var modelMaterial = new THREE.MeshPhongMaterial( { color: 0xffffff, emissive: 0x111100 } );
-      
+
       obj = new THREE.Mesh( modelGeometry, modelMaterial );
     }
     else throw "Invalid renderer object type."
@@ -106,7 +110,7 @@ class ThreeRenderer implements Renderer {
     obj.position.x = position.x;
     obj.position.y =  position.y;
     obj.position.z = 0.0;
-    
+
     obj.scale.x = 0.05;
     obj.scale.y = 0.05;
     obj.scale.z = 0.05;
@@ -123,7 +127,7 @@ class ThreeRenderer implements Renderer {
     mesh.position.y = position.y;
     mesh.position.z = 0.0;
   }
-  
+
   // Rotate an object
   //
   rotation(id: number, angle: number) {
