@@ -27,7 +27,10 @@ class GameObjectDragon implements GameObject {
   private idClickTarget: number;
 
   private rotMatrix: Matrix;
+
   private wiggle: number;
+  private turn: number;
+  private isTurning: boolean;
 
   constructor(renderer: Renderer, position: Vector = new Vector()) {
     this.position = position;
@@ -35,13 +38,16 @@ class GameObjectDragon implements GameObject {
     this.clickTargetVelocity = new Vector(1.0, 0.0);
 
     this.rotMatrix = new Matrix();
-    this.wiggle = 0;
+
+    this.wiggle = 0.0;
+    this.turn = 1.0;
+    this.isTurning = false;
 
     this.renderer = renderer;
     this.id = this.renderer.add( RendererObjectType.SPRITE, "arrow.png", this.position );
     this.idClickTarget = this.renderer.add( RendererObjectType.SPRITE, "circle.png", new Vector() );
 
-    this.target( new Vector(0.0, -0.3) );
+    this.target( new Vector(0.0, -0.2) );
 
     window.addEventListener('click', (e) => {
       var clickPosition: Vector = new Vector(e.clientX, e.clientY);
@@ -62,9 +68,23 @@ class GameObjectDragon implements GameObject {
     // Compute velocity to reach the target
     this.clickTargetVelocity = Vector.norm( Vector.minus(this.clickTarget, this.position) );
 
-    // As the dragon moves it wiggles
-    var wiggleAmount = Vector.minus(this.position, this.clickTarget).distance()*0.8;
-    this.rotMatrix.rotation( Math.sin(this.wiggle)*wiggleAmount );
+    // Target approached, choose rotation direction +1 or -1 each time
+    var targetDistance = Vector.minus(this.position, this.clickTarget).distance();
+    var turn = 0.0;
+
+    if( targetDistance < 0.05 ) {
+      if( !this.isTurning ) {
+        this.isTurning = true;
+        this.turn *= -1.0;
+      }
+      turn = this.turn;
+    }
+    else {
+      this.isTurning = false;
+    }
+
+    // Wiggle and turn
+    this.rotMatrix.rotation( Math.sin(this.wiggle)*targetDistance*0.8 + turn*dt );
     this.rotMatrix.transform( this.clickTargetVelocity );
     this.wiggle += dt*1.0;
 
@@ -72,8 +92,10 @@ class GameObjectDragon implements GameObject {
 
     // Interpolate velocity vector (Note: lerp would cancel out speed)
     if( Math.abs(angleDelta) > dt ) {
-      var direction = angleDelta >= 0 ? +1:-1;
-      if( direction*angleDelta >= Math.PI ) direction *= -1;
+      var angleDeltaRandomized = angleDelta;
+
+      var direction = angleDeltaRandomized >= 0 ? +1:-1;
+      if( direction*angleDeltaRandomized >= Math.PI ) direction *= -1;
 
       this.rotMatrix.rotation(direction*dt);
       this.rotMatrix.transform(this.velocity);
