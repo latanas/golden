@@ -11,6 +11,7 @@
 /// <reference path="matrix.ts" />
 
 /// <reference path="renderer.ts" />
+/// <reference path="trail.ts" />
 /// <reference path="game_object.ts" />
 
 // Dragon controlled by the player
@@ -18,6 +19,9 @@
 class GameObjectDragon implements GameObject {
   private position: Vector;
   private velocity: Vector;
+
+  private speedLinear: number;
+  private speedTurn: number;
 
   private clickTarget: Vector;
   private clickTargetVelocity: Vector;
@@ -32,15 +36,20 @@ class GameObjectDragon implements GameObject {
   private turn: number;
   private isTurning: boolean;
 
-  constructor(renderer: Renderer, position: Vector = new Vector()) {
+  private trail: Trail;
+
+  constructor( renderer:Renderer, position:Vector =new Vector(), speedLinear:number =0.2, speedTurn:number =1.2 ) {
     this.position = position;
     this.velocity = new Vector(1.0, 0.0);
     this.clickTargetVelocity = new Vector(1.0, 0.0);
 
+    this.speedLinear = speedLinear;
+    this.speedTurn = speedTurn;
+
     this.rotMatrix = new Matrix();
 
     this.wiggle = 0.0;
-    this.turn = 1.0;
+    this.turn = this.speedTurn * 1.5;
     this.isTurning = false;
 
     this.renderer = renderer;
@@ -53,6 +62,9 @@ class GameObjectDragon implements GameObject {
       var clickPosition: Vector = new Vector(e.clientX, e.clientY);
       this.target( renderer.unproject(clickPosition) );
     });
+
+    this.trail = new Trail(renderer, 0.05, this.position, this.velocity);
+    for(var i=0; i<5; i++) this.trail.append();
   }
 
   // Target waypoint
@@ -72,7 +84,7 @@ class GameObjectDragon implements GameObject {
     var targetDistance = Vector.minus(this.position, this.clickTarget).distance();
     var turn = 0.0;
 
-    if( targetDistance < 0.05 ) {
+    if( targetDistance < 0.1 ) {
       if( !this.isTurning ) {
         this.isTurning = true;
         this.turn *= -1.0;
@@ -86,7 +98,7 @@ class GameObjectDragon implements GameObject {
     // Wiggle and turn
     this.rotMatrix.rotation( Math.sin(this.wiggle)*targetDistance*0.8 + turn*dt );
     this.rotMatrix.transform( this.clickTargetVelocity );
-    this.wiggle += dt*1.0;
+    this.wiggle += dt*2.0;
 
     var angleDelta = this.clickTargetVelocity.angle() - this.velocity.angle();
 
@@ -97,7 +109,7 @@ class GameObjectDragon implements GameObject {
       var direction = angleDeltaRandomized >= 0 ? +1:-1;
       if( direction*angleDeltaRandomized >= Math.PI ) direction *= -1;
 
-      this.rotMatrix.rotation(direction*dt);
+      this.rotMatrix.rotation(direction*this.speedTurn*dt);
       this.rotMatrix.transform(this.velocity);
     }
     else {
@@ -105,8 +117,11 @@ class GameObjectDragon implements GameObject {
     }
 
     // Update position and rotation
-    this.position = Vector.plus( this.position, Vector.scale(this.velocity, dt*0.1) );
+    this.position = Vector.plus( this.position, Vector.scale(this.velocity, this.speedLinear*dt) );
+
     this.renderer.position( this.id, this.position );
     this.renderer.rotation( this.id, this.velocity.angle() );
+
+    this.trail.follow(this.position, this.speedLinear, dt);
   }
 }

@@ -35,7 +35,7 @@ class Clock{
 
   public tick() {
     var t = this.timeService();
-    this.dt = (t - this.clock) * 0.001; // Sec
+    this.dt = Math.min((t-this.clock)*0.001, 1.0); // Sec
 
     if( this.dt <= 0 ) {
       this.dt = 0.001;
