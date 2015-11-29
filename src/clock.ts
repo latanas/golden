@@ -28,7 +28,7 @@ class Clock{
 
     // Reset clock when focus returns to the game window, or an FPS glitch will occur
     window.addEventListener("focus", () => {
-      this.clock = this.timeService();
+      this.clock = this.timeService() - 1.0/60.0;
     });
     this.fpsElement = document.getElementById("fps");
   }
