@@ -31,7 +31,7 @@ class GameObjectApple implements GameObject {
     this.swing = 0.0;
 
     this.renderer = renderer;
-    this.id = this.renderer.add( RendererObjectType.MODEL, "apple.json", this.position );
+    this.id = this.renderer.add( RendererObjectType.MODEL, "apple.json", this.position, 0.05 );
   }
 
   // Animate the apple

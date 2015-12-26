@@ -20,13 +20,16 @@ enum RendererObjectType {
 //
 interface Renderer {
   // Add an object
-  add(type: RendererObjectType, file: string, position: Vector): number;
+  add(type: RendererObjectType, file: string, position: Vector, size: number): number;
+
+  // Remove an object
+  remove(id: number);
 
   // Position an object
   position(id: number, position: Vector);
 
   // Rotate an object
-  rotation(id: number, angle: number)
+  rotation(id: number, angle: number);
 
   // Unproject vector (Convert screen to scene vector)
   unproject(screenPosition: Vector): Vector;
@@ -45,12 +48,16 @@ class ThreeRenderer implements Renderer {
   private origin:  Vector;
 
   private renderer: THREE.WebGLRenderer;
-  private camera: THREE.PerspectiveCamera;
-  private scene: THREE.Scene;
+  private camera:   THREE.PerspectiveCamera;
+  private scene:    THREE.Scene;
+
+  private idNext: number;
 
   // Construct renderer
   //
   constructor() {
+    this.idNext = 1;
+
     this.width  = window.innerWidth;
     this.height = window.innerHeight;
     this.scale  = Math.min(this.width, this.height);
@@ -87,9 +94,13 @@ class ThreeRenderer implements Renderer {
     this.scene.add( light2 );
   }
 
+  private get(id: number): THREE.Object3D {
+      return this.scene.getObjectByName("object" + id);
+  }
+
   // Add an object
   //
-  add(type: RendererObjectType, file: string, position: Vector): number {
+  add(type: RendererObjectType, file: string, position: Vector, size: number): number {
     var obj = null;
 
     if( type == RendererObjectType.SPRITE ) {
@@ -111,28 +122,36 @@ class ThreeRenderer implements Renderer {
     obj.position.y =  position.y;
     obj.position.z = 0.0;
 
-    obj.scale.x = 0.05;
-    obj.scale.y = 0.05;
-    obj.scale.z = 0.05;
+    obj.scale.x = size;
+    obj.scale.y = size;
+    obj.scale.z = size;
 
+    obj.name = "object" + this.idNext;
     this.scene.add( obj );
-    return this.scene.children.length-1;
+
+    return this.idNext++;
+  }
+
+  // Remove an object
+  remove(id: number) {
+      var obj: THREE.Object3D = this.get(id);
+      this.scene.remove(obj);
   }
 
   // Position an object
   //
   position(id: number, position: Vector) {
-    var mesh = this.scene.children[id];
-    mesh.position.x = position.x;
-    mesh.position.y = position.y;
-    mesh.position.z = 0.0;
+    var obj: THREE.Object3D = this.get(id);
+    obj.position.x = position.x;
+    obj.position.y = position.y;
+    obj.position.z = 0.0;
   }
 
   // Rotate an object
   //
   rotation(id: number, angle: number) {
-    var mesh = this.scene.children[id];
-    mesh.rotation.z = angle;
+    var obj: THREE.Object3D = this.get(id);
+    obj.rotation.z = angle;
   }
 
   // Unproject vector (Convert screen to scene vector)

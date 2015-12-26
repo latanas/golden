@@ -11,13 +11,14 @@
 /// <reference path="matrix.ts" />
 
 /// <reference path="renderer.ts" />
-/// <reference path="trail.ts" />
+
+/// <reference path="dynamic_list.ts" />
 /// <reference path="game_object.ts" />
 
 // Dragon controlled by the player
 //
 class GameObjectDragon implements GameObject {
-  private position: Vector;
+  private position: VectorAreal;
   private velocity: Vector;
 
   private speedLinear: number;
@@ -36,10 +37,10 @@ class GameObjectDragon implements GameObject {
   private turn: number;
   private isTurning: boolean;
 
-  private trail: Trail;
+  private tail: DynamicList;
 
-  constructor( renderer:Renderer, position:Vector =new Vector(), speedLinear:number =0.2, speedTurn:number =1.2 ) {
-    this.position = position;
+  constructor( renderer:Renderer, position:VectorAreal =new VectorAreal(), speedLinear:number =0.2, speedTurn:number =2.0 ) {
+    this.position = position.copyAreal();
     this.velocity = new Vector(1.0, 0.0);
     this.clickTargetVelocity = new Vector(1.0, 0.0);
 
@@ -53,8 +54,8 @@ class GameObjectDragon implements GameObject {
     this.isTurning = false;
 
     this.renderer = renderer;
-    this.id = this.renderer.add( RendererObjectType.SPRITE, "arrow.png", this.position );
-    this.idClickTarget = this.renderer.add( RendererObjectType.SPRITE, "circle.png", new Vector() );
+    this.id = this.renderer.add( RendererObjectType.SPRITE, "arrow.png", this.position, this.position.areal );
+    this.idClickTarget = this.renderer.add( RendererObjectType.SPRITE, "circle.png", new Vector(), 0.05 );
 
     this.target( new Vector(0.0, -0.2) );
 
@@ -63,8 +64,8 @@ class GameObjectDragon implements GameObject {
       this.target( renderer.unproject(clickPosition) );
     });
 
-    this.trail = new Trail(renderer, 0.05, this.position, this.velocity);
-    for(var i=0; i<5; i++) this.trail.append();
+    this.tail = new DynamicList(renderer, this.position, this.velocity);
+    for(var i=0; i<15; i++) this.tail.append();
   }
 
   // Target waypoint
@@ -116,12 +117,18 @@ class GameObjectDragon implements GameObject {
       this.velocity = this.clickTargetVelocity.copy();
     }
 
+    // Cut tail at nearest intersection with dragon's head
+    var nearest: DynamicList = this.tail.getNext(3).getNearest( this.position );
+
+    if( nearest.getPosition().isIntersected(this.position) )
+        nearest.getPrevious().truncate();
+
     // Update position and rotation
-    this.position = Vector.plus( this.position, Vector.scale(this.velocity, this.speedLinear*dt) );
+    this.position.set( Vector.plus(this.position, Vector.scale(this.velocity, this.speedLinear*dt)) );
 
     this.renderer.position( this.id, this.position );
     this.renderer.rotation( this.id, this.velocity.angle() );
 
-    this.trail.follow(this.position, this.speedLinear, dt);
+    this.tail.follow(this.position, this.speedLinear, dt);
   }
 }

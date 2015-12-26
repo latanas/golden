@@ -7,9 +7,9 @@
   http://www.atanaslaskov.com/golden/
 */
 
-/// <reference path="vector.ts" />
 /// <reference path="clock.ts" />
 /// <reference path="renderer.ts" />
+/// <reference path="vector_areal.ts" />
 
 /// <reference path="game_object.ts" />
 /// <reference path="game_object_apple.ts" />
@@ -30,7 +30,7 @@ class Game {
     this.isPaused = false;
 
     this.objects = [
-      new GameObjectDragon( renderer, new Vector(0.0, 0.4) )
+      new GameObjectDragon( renderer, new VectorAreal(0.0, 0.4, 0.05) )
     ];
   }
 
