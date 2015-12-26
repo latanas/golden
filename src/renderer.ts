@@ -106,7 +106,7 @@ class ThreeRenderer implements Renderer {
     if( type == RendererObjectType.SPRITE ) {
       var spriteMap = THREE.ImageUtils.loadTexture( "assets/" + file );
       var spriteMaterial = new THREE.MeshBasicMaterial( { color: 0xffffff, map: spriteMap, transparent: true} );
-      var spriteGeometry = new THREE.PlaneGeometry( 1.0, 1.0, 1, 1 );
+      var spriteGeometry = new THREE.PlaneBufferGeometry( 1.0, 1.0, 1, 1 );
 
       obj = new THREE.Mesh( spriteGeometry, spriteMaterial );
     }
