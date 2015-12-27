@@ -14,7 +14,7 @@
 class VectorAreal extends Vector {
     public areal;
 
-    constructor(x:number =0.0, y:number =0.0, areal =1.0) {
+    constructor(x:number =0.0, y:number =0.0, areal:number =1.0) {
         super(x,y);
         this.areal = areal;
     }

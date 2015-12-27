@@ -25,7 +25,9 @@ class DynamicList {
 
 
   constructor(renderer: Renderer, position: VectorAreal =new VectorAreal(), velocity: Vector =new Vector()) {
-    this.position = position.copyAreal();
+    var v = Vector.minus( position, Vector.scale(velocity, position.areal) );
+
+    this.position = new VectorAreal(v.x, v.y, position.areal);
     this.velocity = velocity.copy();
     this.renderer = renderer;
 
@@ -112,9 +114,7 @@ class DynamicList {
       this.next.append();
     }
     else {
-     var v = Vector.minus( this.position, Vector.scale(this.velocity, this.position.areal) );
-
-     this.next = new DynamicList( this.renderer,  new VectorAreal(v.x, v.y, this.position.areal), this.velocity );
+     this.next = new DynamicList( this.renderer, this.position, this.velocity );
      this.next.prev = this;
     }
   }
@@ -135,7 +135,8 @@ class DynamicList {
   //
   follow( positionFollow: Vector, speedFollow: number, dt: number ): void {
     var distanceDelta          = Vector.minus( positionFollow, this.position ).distance();
-    var distanceAdjustedSpeed  = speedFollow * (1.0 + (distanceDelta-this.position.areal)*10.0 );
+    var elasticitySpeed        = Math.max(-1.0, Math.min(1.0, distanceDelta-this.position.areal))*speedFollow*3.5;
+    var distanceAdjustedSpeed  = speedFollow + elasticitySpeed;
 
     this.velocity = Vector.norm( Vector.minus( positionFollow, this.position) );
     this.position.set( Vector.plus(this.position, Vector.scale(this.velocity, distanceAdjustedSpeed*dt)) );
