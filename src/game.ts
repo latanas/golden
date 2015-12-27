@@ -30,7 +30,8 @@ class Game {
     this.isPaused = false;
 
     this.objects = [
-      new GameObjectDragon( renderer, new VectorAreal(0.0, 0.4, 0.05) )
+      new GameObjectDragon( renderer, new VectorAreal(0.0, 0.4, 0.05) ),
+      new GameObjectApple( renderer, new VectorAreal(0.3, 0.0, 0.05) )
     ];
   }
 

@@ -44,6 +44,19 @@ class DynamicList {
       return this.position;
   }
 
+  // Get element count
+  //
+  getCount() {
+      var n:  number = 1;
+      var dl: DynamicList = this;
+
+      while( dl.next ) {
+          n++;
+          dl = dl.next;
+      }
+      return n;
+  }
+
   // Get next element
   //
   getNext(n: number =1): DynamicList {

@@ -24,6 +24,6 @@ class VectorAreal extends Vector {
     }
 
     isIntersected(v: VectorAreal): boolean {
-        return Vector.minus(this, v).distance() < this.areal + v.areal;
+        return Vector.minus(this, v).distance() < (this.areal + v.areal)/2.0;
     }
 }

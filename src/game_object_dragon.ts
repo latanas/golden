@@ -25,7 +25,6 @@ class GameObjectDragon implements GameObject {
   private speedTurn: number;
 
   private clickTarget: Vector;
-  private clickTargetVelocity: Vector;
 
   private renderer: Renderer;
   private id: number;
@@ -35,27 +34,38 @@ class GameObjectDragon implements GameObject {
 
   private wiggle: number;
   private turn: number;
+
   private isTurning: boolean;
+  private turnDirection: number;
 
   private tail: DynamicList;
 
-  constructor( renderer:Renderer, position:VectorAreal =new VectorAreal(), speedLinear:number =0.2, speedTurn:number =2.0 ) {
+  constructor( renderer:Renderer, position:VectorAreal =new VectorAreal(), speedLinear:number =0.2, speedTurn:number =3.0 ) {
     this.position = position.copyAreal();
     this.velocity = new Vector(1.0, 0.0);
-    this.clickTargetVelocity = new Vector(1.0, 0.0);
 
     this.speedLinear = speedLinear;
-    this.speedTurn = speedTurn;
+    this.speedTurn   = speedTurn;
 
     this.rotMatrix = new Matrix();
 
     this.wiggle = 0.0;
-    this.turn = this.speedTurn * 1.5;
-    this.isTurning = false;
+    this.turn   = 0.0;
+
+    this.isTurning     = false;
+    this.turnDirection = +1;
 
     this.renderer = renderer;
-    this.id = this.renderer.add( RendererObjectType.SPRITE, "arrow.png", this.position, this.position.areal );
-    this.idClickTarget = this.renderer.add( RendererObjectType.SPRITE, "circle.png", new Vector(), 0.05 );
+
+    this.id = this.renderer.add(
+        RendererObjectType.SPRITE, "arrow.png",
+        this.position, this.position.areal
+    );
+
+    this.idClickTarget = this.renderer.add(
+        RendererObjectType.SPRITE, "circle.png",
+        new Vector(), 0.05
+    );
 
     this.target( new Vector(0.0, -0.2) );
 
@@ -64,7 +74,7 @@ class GameObjectDragon implements GameObject {
       this.target( renderer.unproject(clickPosition) );
     });
 
-    this.tail = new DynamicList(renderer, this.position, this.velocity);
+    this.tail = new DynamicList( renderer, this.position, this.velocity );
     for(var i=0; i<15; i++) this.tail.append();
   }
 
@@ -78,52 +88,51 @@ class GameObjectDragon implements GameObject {
   // Animate the dragon
   //
   animate(dt: number): void {
-    // Compute velocity to reach the target
-    this.clickTargetVelocity = Vector.norm( Vector.minus(this.clickTarget, this.position) );
-
-    // Target approached, choose rotation direction +1 or -1 each time
+    var targetVelocity = Vector.norm( Vector.minus(this.clickTarget, this.position) );
     var targetDistance = Vector.minus(this.position, this.clickTarget).distance();
-    var turn = 0.0;
 
-    if( targetDistance < 0.1 ) {
-      if( !this.isTurning ) {
-        this.isTurning = true;
-        this.turn *= -1.0;
-      }
-      turn = this.turn;
+    // If target approached, add [+1; -1] rotation bias
+    if( targetDistance >= 0.1 ) {
+        this.isTurning = false;
+        this.turn      = 0.0;
+        this.wiggle   += dt*2.0;
+    }
+    else if( this.isTurning ) {
+        this.turn += dt*this.turnDirection*0.5;
     }
     else {
-      this.isTurning = false;
+        this.isTurning      = true;
+        this.turnDirection *= -1;
     }
 
-    // Wiggle and turn
-    this.rotMatrix.rotation( Math.sin(this.wiggle)*targetDistance*0.8 + turn*dt );
-    this.rotMatrix.transform( this.clickTargetVelocity );
-    this.wiggle += dt*2.0;
+    // Turn and wiggle
+    this.rotMatrix.rotation( this.turn + Math.sin(this.wiggle)*targetDistance*0.8 );
+    this.rotMatrix.transform( targetVelocity );
 
-    var angleDelta = this.clickTargetVelocity.angle() - this.velocity.angle();
+    var angleDelta = targetVelocity.angle() - this.velocity.angle();
 
-    // Interpolate velocity vector (Note: lerp would cancel out speed)
+    // Choose shortest rotation direction [+1; -1]
     if( Math.abs(angleDelta) > dt ) {
-      var angleDeltaRandomized = angleDelta;
-
-      var direction = angleDeltaRandomized >= 0 ? +1:-1;
-      if( direction*angleDeltaRandomized >= Math.PI ) direction *= -1;
+      var direction = angleDelta >= 0 ? +1:-1;
+      if( direction*angleDelta >= Math.PI ) direction *= -1;
 
       this.rotMatrix.rotation(direction*this.speedTurn*dt);
       this.rotMatrix.transform(this.velocity);
     }
     else {
-      this.velocity = this.clickTargetVelocity.copy();
+      this.velocity = targetVelocity.copy();
     }
 
     // Cut tail at nearest intersection with dragon's head
-    var nearest: DynamicList = this.tail.getNext(3).getNearest( this.position );
+    if( this.tail.getCount() > 2 ) {
+        var nearest: DynamicList = this.tail.getNext(2).getNearest( this.position );
 
-    if( nearest.getPosition().isIntersected(this.position) )
-        nearest.getPrevious().truncate();
+        if( nearest.getPosition().isIntersected(this.position) )
+            nearest.getPrevious().truncate();
+    }
 
     // Update position and rotation
+    //
     this.position.set( Vector.plus(this.position, Vector.scale(this.velocity, this.speedLinear*dt)) );
 
     this.renderer.position( this.id, this.position );
