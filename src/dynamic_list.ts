@@ -24,12 +24,15 @@ class DynamicList {
   private prev: DynamicList;
 
 
-  constructor(renderer: Renderer, position: VectorAreal = new VectorAreal(), velocity: Vector = new Vector()) {
+  constructor(renderer: Renderer, position: VectorAreal =new VectorAreal(), velocity: Vector =new Vector()) {
     this.position = position.copyAreal();
     this.velocity = velocity.copy();
-
     this.renderer = renderer;
-    this.id = this.renderer.add( RendererObjectType.SPRITE, "arrow.png", this.position, this.position.areal );
+
+    this.id = this.renderer.add(
+        RendererObjectType.SPRITE, "arrow.png",
+        this.position, this.position.areal
+    );
 
     this.next = null;
     this.prev = null;
@@ -74,19 +77,19 @@ class DynamicList {
   getNearest( position: Vector ): DynamicList {
       var distanceNearest: number = Vector.minus(this.position, position).distance();
 
-      var DynamicListNearest: DynamicList  = this;
-      var DynamicListNext:    DynamicList  = this.next;
+      var dlNearest: DynamicList  = this;
+      var dlNext:    DynamicList  = this.next;
 
-      while( DynamicListNext ) {
-          var d: number = Vector.minus( DynamicListNext.position, position ).distance();
+      while( dlNext ) {
+          var d: number = Vector.minus( dlNext.position, position ).distance();
 
           if( d < distanceNearest ) {
-              distanceNearest = d;
-              DynamicListNearest = DynamicListNext;
+              distanceNearest  = d;
+              dlNearest        = dlNext;
           }
-          DynamicListNext = DynamicListNext.next;
+          dlNext = dlNext.next;
       }
-      return DynamicListNearest;
+      return dlNearest;
   }
 
   // Append to DynamicList
@@ -96,8 +99,9 @@ class DynamicList {
       this.next.append();
     }
     else {
-     var p = Vector.minus( this.position, Vector.scale(this.velocity, this.position.areal) );
-     this.next = new DynamicList( this.renderer, new VectorAreal(p.x, p.y, this.position.areal), this.velocity );
+     var v = Vector.minus( this.position, Vector.scale(this.velocity, this.position.areal) );
+
+     this.next = new DynamicList( this.renderer,  new VectorAreal(v.x, v.y, this.position.areal), this.velocity );
      this.next.prev = this;
     }
   }
@@ -105,11 +109,11 @@ class DynamicList {
   // Truncate the DynamicList
   //
   truncate() {
-      var DynamicListNext: DynamicList = this.next;
+      var dl: DynamicList = this.next;
 
-      while( DynamicListNext ) {
-          this.renderer.remove(DynamicListNext.id);
-          DynamicListNext = DynamicListNext.next;
+      while( dl ) {
+          this.renderer.remove(dl.id);
+          dl = dl.next;
       }
       this.next = null;
   }
@@ -117,8 +121,8 @@ class DynamicList {
   // Follow an object
   //
   follow( positionFollow: Vector, speedFollow: number, dt: number ): void {
-    var distanceDelta = Vector.minus( positionFollow, this.position ).distance();
-    var distanceAdjustedSpeed = speedFollow * (1.0 + (distanceDelta-this.position.areal)*10.0 );
+    var distanceDelta          = Vector.minus( positionFollow, this.position ).distance();
+    var distanceAdjustedSpeed  = speedFollow * (1.0 + (distanceDelta-this.position.areal)*10.0 );
 
     this.velocity = Vector.norm( Vector.minus( positionFollow, this.position) );
     this.position.set( Vector.plus(this.position, Vector.scale(this.velocity, distanceAdjustedSpeed*dt)) );
@@ -128,6 +132,5 @@ class DynamicList {
 
     // Propagate movement down the DynamicList
     if( this.next ) this.next.follow( this.position, distanceAdjustedSpeed, dt );
-
   }
 }
