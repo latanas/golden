@@ -20,16 +20,22 @@ class GameObjectFactory implements GameObject {
   private renderer: Renderer;
   private pending: GameObject[];
 
-  private countConsumablesTarget;
-  private countConsumables;
+  private countConsumablesTarget: number;
+  private countConsumables: number;
+
+  private waitTimeMax: number;
+  private waitTime: number;
 
   constructor(renderer: Renderer) {
     this.renderer = renderer;
 
     this.pending = [];
 
-    this.countConsumablesTarget  = 3;
-    this.countConsumables        = 0;
+    this.countConsumablesTarget   = 3;
+    this.countConsumables         = 0;
+
+    this.waitTimeMax  = 5.0;
+    this.waitTime     = 0.0;
   }
 
   private makeConsumable(): GameObject {
@@ -37,16 +43,21 @@ class GameObjectFactory implements GameObject {
     return new GameObjectConsumable( this.renderer, position );
   }
 
+  private factory() {
+    if( this.countConsumables < this.countConsumablesTarget  ) {
+        this.pending.push( this.makeConsumable() );
+    }
+  }
+
   // Animate the factory
   //
   animate(dt: number): void {
-    //console.log(this.countConsumables);
+    this.waitTime -= dt;
 
-    while( this.countConsumables < this.countConsumablesTarget  ) {
-      this.pending.push( this.makeConsumable() );
-      this.countConsumables++;
+    if( this.waitTime <= 0 ) {
+      this.waitTime = this.waitTimeMax;
+      this.factory();
     }
-
     this.countConsumables = 0;
   }
 
