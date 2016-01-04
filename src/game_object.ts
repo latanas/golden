@@ -14,4 +14,12 @@
 //
 interface GameObject {
   animate( dt: number ): void;
+  perceive( another: GameObject ): void;
+  remove(): void;
+
+  getPosition(): Vector;
+  getPreceiveDistance(): number;
+
+  isAlive(): boolean;
+  isPerceptive(): boolean;
 }

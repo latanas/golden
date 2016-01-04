@@ -14,6 +14,7 @@
 
 /// <reference path="dynamic_list.ts" />
 /// <reference path="game_object.ts" />
+/// <reference path="game_object_consumable.ts" />
 
 // Dragon controlled by the player
 //
@@ -139,5 +140,51 @@ class GameObjectDragon implements GameObject {
     this.renderer.rotation( this.id, this.velocity.angle() );
 
     this.tail.follow(this.position, this.speedLinear, dt);
+  }
+
+   // Remove the dragon
+  //
+  remove(): void {
+    this.renderer.remove(this.id);
+    this.renderer.remove(this.idClickTarget);
+  }
+
+  // Perceive another object
+  //
+  perceive( another: GameObject ): void {
+    if( another instanceof GameObjectConsumable ) {
+      this.eat(<GameObjectConsumable> another);
+    }
+  }
+
+  // Dragon eats another object
+  //
+  eat( consumable: GameObjectConsumable ) {
+    var value = consumable.consume();
+    for(var i=0; i<value; i++) this.tail.append();
+  }
+
+  // Get position
+  //
+  getPosition(): Vector {
+    return this.position;
+  }
+
+  // Get perceive distance
+  //
+  getPreceiveDistance(): number {
+    return this.position.areal * 1.5;
+  }
+
+  // Is object alive
+  //
+  isAlive() {
+    return true;
+  }
+
+  // Is object perceiving
+  //
+  isPerceptive() {
+    return true;
   }
 }
