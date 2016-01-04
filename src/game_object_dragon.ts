@@ -41,7 +41,7 @@ class GameObjectDragon implements GameObject {
 
   private tail: DynamicList;
 
-  constructor( renderer:Renderer, position:VectorAreal =new VectorAreal(), speedLinear:number =0.2, speedTurn:number =3.0 ) {
+  constructor( renderer:Renderer, position:VectorAreal =new VectorAreal(), speedLinear:number =0.2, speedTurn:number =1.5 ) {
     this.position = position.copyAreal();
     this.velocity = new Vector(1.0, 0.0);
 
@@ -68,7 +68,7 @@ class GameObjectDragon implements GameObject {
         new Vector(), 0.05
     );
 
-    this.target( new Vector(0.0, -0.2) );
+    this.target( new Vector() );
 
     window.addEventListener('click', (e) => {
       var clickPosition: Vector = new Vector(e.clientX, e.clientY);
@@ -76,7 +76,7 @@ class GameObjectDragon implements GameObject {
     });
 
     this.tail = new DynamicList( renderer, this.position, this.velocity );
-    for(var i=0; i<15; i++) this.tail.append();
+    for(var i=0; i<5; i++) this.tail.append();
   }
 
   // Target waypoint
@@ -107,7 +107,7 @@ class GameObjectDragon implements GameObject {
     }
 
     // Turn and wiggle
-    this.rotMatrix.rotation( this.turn + Math.sin(this.wiggle)*targetDistance*0.8 );
+    this.rotMatrix.rotation( this.turn + Math.sin(this.wiggle)*targetDistance*0.5 );
     this.rotMatrix.transform( targetVelocity );
 
     var angleDelta = targetVelocity.angle() - this.velocity.angle();
@@ -142,7 +142,13 @@ class GameObjectDragon implements GameObject {
     this.tail.follow(this.position, this.speedLinear, dt);
   }
 
-   // Remove the dragon
+  // Spawn new objects
+  //
+  spawn(): GameObject[] {
+    return [];
+  }
+
+  // Remove the dragon
   //
   remove(): void {
     this.renderer.remove(this.id);

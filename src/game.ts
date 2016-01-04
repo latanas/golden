@@ -12,8 +12,8 @@
 /// <reference path="vector_areal.ts" />
 
 /// <reference path="game_object.ts" />
-/// <reference path="game_object_consumable.ts" />
 /// <reference path="game_object_dragon.ts" />
+/// <reference path="game_object_factory.ts" />
 
 // Game manages the dynamic objects
 //
@@ -30,10 +30,8 @@ class Game {
     this.isPaused = false;
 
     this.objects = [
-      new GameObjectDragon( renderer, new VectorAreal(0.0, 0.4, 0.05) ),
-      new GameObjectConsumable( renderer, new VectorAreal(0.0, 0.0, 0.05) ),
-      new GameObjectConsumable( renderer, new VectorAreal(+0.3, 0.0, 0.05) ),
-      new GameObjectConsumable( renderer, new VectorAreal(-0.3, 0.0, 0.05) )
+      new GameObjectFactory( renderer ),
+      new GameObjectDragon( renderer, new VectorAreal(0.0, 0.4, 0.05) )
     ];
   }
 
@@ -70,6 +68,9 @@ class Game {
       var obj = this.objects[i];
       obj.animate(dt);
 
+      var pendingObjects: GameObject[] = obj.spawn();
+      while( pendingObjects.length ) this.spawn( pendingObjects.pop() );
+
       if( !obj.isPerceptive() ) continue;
       var pos: Vector = obj.getPosition();
 
@@ -81,5 +82,17 @@ class Game {
         if( d < obj.getPreceiveDistance() ) obj.perceive( objPercept );
       }
     }
+  }
+
+  // Spawn a new object
+  //
+  spawn( obj: GameObject ) {
+    for( var i=0; i<this.objects.length; i++) {
+      if( !this.objects[i] ) {
+        this.objects[i] = obj;
+        return;
+      }
+    }
+    this.objects.push(obj);
   }
 }

@@ -15,6 +15,7 @@
 interface GameObject {
   animate( dt: number ): void;
   perceive( another: GameObject ): void;
+  spawn(): GameObject[];
   remove(): void;
 
   getPosition(): Vector;

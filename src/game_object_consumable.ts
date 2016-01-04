@@ -18,7 +18,6 @@ class GameObjectConsumable implements GameObject {
   private velocity: Vector;
 
   private renderer: Renderer;
-  private renderPosition: Vector;
 
   private id: number;
   private swing: number;
@@ -29,8 +28,7 @@ class GameObjectConsumable implements GameObject {
     this.position = position;
     this.velocity = new Vector();
 
-    this.renderPosition = position.copy();
-    this.swing = 0.0;
+    this.swing = Math.random()*Math.PI;
 
     this.renderer = renderer;
     this.id = this.renderer.add( RendererObjectType.MODEL, "apple.json", this.position, 0.03 );
@@ -41,13 +39,11 @@ class GameObjectConsumable implements GameObject {
   // Animate the consumable
   //
   animate(dt: number): void {
-    this.swing += dt * 2.0;
+    this.swing += dt * 3.0;
     this.position = Vector.plus( this.position, Vector.scale(this.velocity, dt) );
+    this.position.y += Math.sin( this.swing )*0.001;
 
-    this.renderPosition.set( this.position );
-    this.renderPosition.y += Math.sin( this.swing )*0.05;
-
-    this.renderer.position( this.id, this.renderPosition );
+    this.renderer.position( this.id, this.position );
   }
 
   // Perceive nothing
@@ -60,6 +56,12 @@ class GameObjectConsumable implements GameObject {
     var v = this.value;
     this.value = 0;
     return v;
+  }
+
+  // Spawn new objects
+  //
+  spawn(): GameObject[] {
+    return [];
   }
 
   // Remove the consumable

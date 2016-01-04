@@ -112,7 +112,7 @@ class ThreeRenderer implements Renderer {
     }
     else if( type == RendererObjectType.MODEL ) {
       var modelGeometry = new THREE.SphereGeometry( 1.0, 32, 32 ); // TODO: Load model file
-      var modelMaterial = new THREE.MeshPhongMaterial( { color: 0xffffff, emissive: 0x111100 } );
+      var modelMaterial = new THREE.MeshPhongMaterial( { color: 0xffaa00, emissive: 0x333300 } );
 
       obj = new THREE.Mesh( modelGeometry, modelMaterial );
     }
