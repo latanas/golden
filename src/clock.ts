@@ -27,19 +27,14 @@ class Clock{
     this.fpsUpdateTime = 0;
 
     // Reset clock when focus returns to the game window, or an FPS glitch will occur
-    window.addEventListener("focus", () => {
-      this.clock = this.timeService() - 1.0/60.0;
-    });
+    window.addEventListener("focus", () => { this.clock = this.timeService() - 1.0/60.0; });
     this.fpsElement = document.getElementById("fps");
   }
 
   public tick() {
     var t = this.timeService();
-    this.dt = Math.min((t-this.clock)*0.001, 1.0); // Sec
+    this.dt = Math.min((t-this.clock)*0.001, 0.1); // Sec, min 10 FPS
 
-    if( this.dt <= 0 ) {
-      this.dt = 0.001;
-    }
     this.fps = 1.0 / this.dt;
     this.clock = t;
 
