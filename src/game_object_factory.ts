@@ -34,7 +34,7 @@ class GameObjectFactory implements GameObject {
     this.countConsumablesTarget   = 3;
     this.countConsumables         = 0;
 
-    this.waitTimeMax  = 5.0;
+    this.waitTimeMax  = 3.0;
     this.waitTime     = 0.0;
   }
 

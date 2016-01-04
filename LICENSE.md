@@ -1,4 +1,4 @@
-Copyright (c) 2015, Atanas Laskov
+Copyright (c) 2015, 2016 Atanas Laskov
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without

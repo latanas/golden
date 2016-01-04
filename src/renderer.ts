@@ -50,6 +50,7 @@ class ThreeRenderer implements Renderer {
   private renderer: THREE.WebGLRenderer;
   private camera:   THREE.PerspectiveCamera;
   private scene:    THREE.Scene;
+  private textureLoader: THREE.TextureLoader;
 
   private idNext: number;
 
@@ -71,6 +72,7 @@ class ThreeRenderer implements Renderer {
     this.renderer = new THREE.WebGLRenderer({ canvas: c, antialias: true });
     this.scene    = new THREE.Scene();
     this.camera   = new THREE.PerspectiveCamera( 50, this.width/this.height, 0.1, 1000 );
+    this.textureLoader = new THREE.TextureLoader();
 
     this.camera.position.z = 1;
 
@@ -104,15 +106,15 @@ class ThreeRenderer implements Renderer {
     var obj = null;
 
     if( type == RendererObjectType.SPRITE ) {
-      var spriteMap = THREE.ImageUtils.loadTexture( "assets/" + file );
-      var spriteMaterial = new THREE.MeshBasicMaterial( { color: 0xffffff, map: spriteMap, transparent: true} );
+      var spriteMap = this.textureLoader.load( "assets/" + file );
+      var spriteMaterial = new THREE.MeshBasicMaterial( {color: 0xffffff, map: spriteMap, transparent: true, depthTest: false} );
       var spriteGeometry = new THREE.PlaneBufferGeometry( 1.0, 1.0, 1, 1 );
 
       obj = new THREE.Mesh( spriteGeometry, spriteMaterial );
     }
     else if( type == RendererObjectType.MODEL ) {
       var modelGeometry = new THREE.SphereGeometry( 1.0, 32, 32 ); // TODO: Load model file
-      var modelMaterial = new THREE.MeshPhongMaterial( { color: 0xffaa00, emissive: 0x333300 } );
+      var modelMaterial = new THREE.MeshPhongMaterial( {color: 0xffaa00, emissive: 0x333300, depthTest: false} );
 
       obj = new THREE.Mesh( modelGeometry, modelMaterial );
     }
