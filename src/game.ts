@@ -15,6 +15,8 @@
 /// <reference path="game_object_dragon.ts" />
 /// <reference path="game_object_factory.ts" />
 
+/// <reference path="slot_list.ts" />
+
 // Game manages the dynamic objects
 //
 class Game {
@@ -22,17 +24,17 @@ class Game {
   private clock: Clock;
   private isPaused: boolean;
 
-  private objects: GameObject[];
+  private objects: SlotList;
 
   constructor( renderer: Renderer ) {
     this.renderer = renderer;
     this.clock    = new Clock();
     this.isPaused = false;
 
-    this.objects = [
+    this.objects = new SlotList([
       new GameObjectFactory( renderer ),
       new GameObjectDragon( renderer, new VectorAreal(0.0, 0.4, 0.05) )
-    ];
+    ]);
   }
 
   // Single action frame of the game
@@ -58,43 +60,41 @@ class Game {
   private animate( dt: number ) {
     this.renderer.animate(dt);
 
-    for( var i=0; i<this.objects.length; i++ ) {
-      if( !this.objects[i] ) continue;
+    this.objects.each( (obj: GameObject, id:number) => {
 
-      if( !this.objects[i].isAlive() ) {
-        this.objects[i].remove();
-        this.objects[i] = null;
-        continue;
+      if( !obj.isAlive() )
+      {
+        obj.remove();
+        this.objects.remove(id);
+        return;
       }
 
-      var obj = this.objects[i];
       obj.animate(dt);
 
       var pendingObjects: GameObject[] = obj.spawn();
       while( pendingObjects.length ) this.spawn( pendingObjects.pop() );
 
-      if( !obj.isPerceptive() ) continue;
-      var pos: Vector = obj.getPosition();
+      if( obj.isPerceptive() ) this.perceive(obj, id);
+    });
+  }
 
-      for( var j=0; j<this.objects.length; j++ ) {
-        var objPercept = this.objects[j];
-        if( (i == j) || !objPercept ) continue;
+  // Object perceives the world
+  //
+  perceive(obj: GameObject, id: number)
+  {
+    var pos: Vector = obj.getPosition();
 
-        var d: number = Vector.minus( pos, objPercept.getPosition() ).distance();
-        if( d < obj.getPreceiveDistance() ) obj.perceive( objPercept );
-      }
-    }
+    this.objects.each( (objPercept: GameObject, k:number) => {
+      if( (id == k) || !objPercept ) return;
+
+      var d: number = Vector.minus( pos, objPercept.getPosition() ).distance();
+      if( d < obj.getPreceiveDistance() ) obj.perceive( objPercept );
+    });
   }
 
   // Spawn a new object
   //
   spawn( obj: GameObject ) {
-    for( var i=0; i<this.objects.length; i++) {
-      if( !this.objects[i] ) {
-        this.objects[i] = obj;
-        return;
-      }
-    }
-    this.objects.push(obj);
+    this.objects.enlist(obj);
   }
 }

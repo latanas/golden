@@ -9,6 +9,7 @@
 
 /// <reference path="../typings/threejs/three.d.ts" />
 /// <reference path="vector.ts" />
+/// <reference path="slot_list.ts" />
 
 // Renderer object types
 //
@@ -57,8 +58,9 @@ class ThreeRenderer implements Renderer {
 
   private idNext: number;
 
-  private fadeInList:  THREE.Mesh[];
-  private fadeOutList: THREE.Mesh[];
+  private fadeSpeed:   number;
+  private fadeInList:  SlotList;
+  private fadeOutList: SlotList;
 
   // Construct renderer
   //
@@ -101,41 +103,13 @@ class ThreeRenderer implements Renderer {
     light2.position.set( +1.0, -1.0, -0.5 );
     this.scene.add( light2 );
 
-    this.fadeInList   = [];
-    this.fadeOutList  = [];
+    this.fadeSpeed    = 1.5;
+    this.fadeInList   = new SlotList();
+    this.fadeOutList  = new SlotList();
   }
 
   private get(id: number): THREE.Object3D {
       return this.scene.getObjectByName("object" + id);
-  }
-
-  // Add object to internal list
-  //
-  private enlist( obj: any, list: THREE.Mesh[] ): number
-  {
-    var isEnlisted = false;
-
-    for( var i=0; i<list.length; i++ ) {
-      if( !list[i] ) {
-        list[i] = obj;
-        isEnlisted = true;
-        return i;
-      }
-    }
-    if( !isEnlisted ) {
-      list.push( obj );
-      return list.length;
-    }
-  }
-
-  // Perform action on internal list
-  //
-  private perform( action: (obj: THREE.Mesh, n: number) => void, list: THREE.Mesh[] )
-  {
-    for( var i=0; i<list.length; i++ ) {
-      if( !list[i] ) continue;
-      action( list[i], i );
-    }
   }
 
   // Add an object
@@ -167,7 +141,7 @@ class ThreeRenderer implements Renderer {
     obj.scale.z = size;
 
     obj.material.opacity = 0.0;
-    this.enlist( obj, this.fadeInList );
+    this.fadeInList.enlist(obj);
 
     obj.name = "object" + this.idNext;
     this.scene.add( obj );
@@ -177,8 +151,12 @@ class ThreeRenderer implements Renderer {
 
   // Remove an object
   remove(id: number) {
-      var obj: THREE.Mesh = <THREE.Mesh> this.get(id);
-      this.enlist( obj, this.fadeOutList );
+      var obj: THREE.Mesh  = <THREE.Mesh> this.get(id);
+
+      var idFade: number = this.fadeInList.find(obj);
+      if( idFade >= 0 ) this.fadeInList.remove(id);
+
+      this.fadeOutList.enlist(obj);
   }
 
   // Position an object
@@ -223,24 +201,33 @@ class ThreeRenderer implements Renderer {
   // Animate the scene
   //
   animate( dt: number ) {
-    // Fade in objects
-    this.perform( (obj: THREE.Mesh, n: number) => {
-      obj.material.opacity += dt;
+    var opacityDelta = this.fadeSpeed * dt;
 
-      if( obj.material.opacity >= 1.0 ) {
-        obj.material.opacity = 1.0;
-        this.fadeInList[n] = null;
+    // Fade in objects
+    this.fadeInList.each( (obj: THREE.Mesh, id: number) => {
+      var opacity = obj.material.opacity + opacityDelta;
+
+      if( opacity < 1.0 ) {
+        obj.material.opacity = opacity;
       }
-    }, this.fadeInList);
+      else {
+        obj.material.opacity = 1.0;
+        this.fadeInList.remove(id);
+      }
+    });
 
     // Fade out objects
-    this.perform( (obj: THREE.Mesh, n: number) => {
-      obj.material.opacity -= dt;
+    this.fadeOutList.each( (obj: THREE.Mesh, id: number) => {
+      var opacity = obj.material.opacity - opacityDelta;
 
-      if( obj.material.opacity <= 0.0 ) {
-        this.fadeOutList[n] = null;
+      if( opacity > 0.0 ) {
+          obj.material.opacity = opacity;
+      }
+      else {
+        obj.material.opacity = 0.0;
+        this.fadeOutList.remove(id);
         this.scene.remove(obj);
       }
-    }, this.fadeOutList);
+    });
   }
 }
