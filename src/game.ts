@@ -56,6 +56,8 @@ class Game {
   // Make things move
   //
   private animate( dt: number ) {
+    this.renderer.animate(dt);
+
     for( var i=0; i<this.objects.length; i++ ) {
       if( !this.objects[i] ) continue;
 

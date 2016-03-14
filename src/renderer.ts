@@ -36,6 +36,9 @@ interface Renderer {
 
   // Render scene
   render();
+
+  // Animate scene
+  animate(dt: number);
 }
 
 // Renderer implementation using ThreeJS
@@ -53,6 +56,9 @@ class ThreeRenderer implements Renderer {
   private textureLoader: THREE.TextureLoader;
 
   private idNext: number;
+
+  private fadeInList:  THREE.Mesh[];
+  private fadeOutList: THREE.Mesh[];
 
   // Construct renderer
   //
@@ -94,10 +100,42 @@ class ThreeRenderer implements Renderer {
     var light2 = new THREE.DirectionalLight( 0xffffff, 0.1 );
     light2.position.set( +1.0, -1.0, -0.5 );
     this.scene.add( light2 );
+
+    this.fadeInList   = [];
+    this.fadeOutList  = [];
   }
 
   private get(id: number): THREE.Object3D {
       return this.scene.getObjectByName("object" + id);
+  }
+
+  // Add object to internal list
+  //
+  private enlist( obj: any, list: THREE.Mesh[] ): number
+  {
+    var isEnlisted = false;
+
+    for( var i=0; i<list.length; i++ ) {
+      if( !list[i] ) {
+        list[i] = obj;
+        isEnlisted = true;
+        return i;
+      }
+    }
+    if( !isEnlisted ) {
+      list.push( obj );
+      return list.length;
+    }
+  }
+
+  // Perform action on internal list
+  //
+  private perform( action: (obj: THREE.Mesh, n: number) => void, list: THREE.Mesh[] )
+  {
+    for( var i=0; i<list.length; i++ ) {
+      if( !list[i] ) continue;
+      action( list[i], i );
+    }
   }
 
   // Add an object
@@ -114,7 +152,7 @@ class ThreeRenderer implements Renderer {
     }
     else if( type == RendererObjectType.MODEL ) {
       var modelGeometry = new THREE.SphereGeometry( 1.0, 32, 32 ); // TODO: Load model file
-      var modelMaterial = new THREE.MeshPhongMaterial( {color: 0xffaa00, emissive: 0x333300, depthTest: false} );
+      var modelMaterial = new THREE.MeshPhongMaterial( {color: 0xffaa00, emissive: 0x333300, depthTest: false, transparent: true} );
 
       obj = new THREE.Mesh( modelGeometry, modelMaterial );
     }
@@ -128,6 +166,9 @@ class ThreeRenderer implements Renderer {
     obj.scale.y = size;
     obj.scale.z = size;
 
+    obj.material.opacity = 0.0;
+    this.enlist( obj, this.fadeInList );
+
     obj.name = "object" + this.idNext;
     this.scene.add( obj );
 
@@ -136,8 +177,8 @@ class ThreeRenderer implements Renderer {
 
   // Remove an object
   remove(id: number) {
-      var obj: THREE.Object3D = this.get(id);
-      this.scene.remove(obj);
+      var obj: THREE.Mesh = <THREE.Mesh> this.get(id);
+      this.enlist( obj, this.fadeOutList );
   }
 
   // Position an object
@@ -177,5 +218,29 @@ class ThreeRenderer implements Renderer {
   //
   render() {
     this.renderer.render( this.scene, this.camera );
+  }
+
+  // Animate the scene
+  //
+  animate( dt: number ) {
+    // Fade in objects
+    this.perform( (obj: THREE.Mesh, n: number) => {
+      obj.material.opacity += dt;
+
+      if( obj.material.opacity >= 1.0 ) {
+        obj.material.opacity = 1.0;
+        this.fadeInList[n] = null;
+      }
+    }, this.fadeInList);
+
+    // Fade out objects
+    this.perform( (obj: THREE.Mesh, n: number) => {
+      obj.material.opacity -= dt;
+
+      if( obj.material.opacity <= 0.0 ) {
+        this.fadeOutList[n] = null;
+        this.scene.remove(obj);
+      }
+    }, this.fadeOutList);
   }
 }
