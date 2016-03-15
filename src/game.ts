@@ -11,8 +11,8 @@
 /// <reference path="renderer.ts" />
 /// <reference path="vector_areal.ts" />
 
-/// <reference path="game_object.ts" />
-/// <reference path="game_object_dragon.ts" />
+/// <reference path="game_object_player.ts" />
+/// <reference path="game_object_glutton.ts" />
 /// <reference path="game_object_factory.ts" />
 
 /// <reference path="slot_list.ts" />
@@ -33,7 +33,8 @@ class Game {
 
     this.objects = new SlotList([
       new GameObjectFactory( renderer ),
-      new GameObjectDragon( renderer, new VectorAreal(0.0, 0.4, 0.05) )
+      new GameObjectPlayer( renderer, new VectorAreal(0.0, 0.4, 0.06) ),
+      new GameObjectGlutton( renderer, new VectorAreal(0.0, -0.4, 0.03) )
     ]);
   }
 

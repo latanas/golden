@@ -13,38 +13,52 @@
 /// <reference path="renderer.ts" />
 
 /// <reference path="dynamic_list.ts" />
+
 /// <reference path="game_object.ts" />
 /// <reference path="game_object_consumable.ts" />
 
-// Dragon controlled by the player
+// Creature in the game
 //
-class GameObjectDragon implements GameObject {
-  private position: VectorAreal;
-  private velocity: Vector;
+class GameObjectCreature implements GameObject {
+  // Position and velocity vector
+  protected position: VectorAreal;
+  protected velocity: Vector;
 
-  private speedLinear: number;
-  private speedTurn: number;
+  // Target coordinate and speeds
+  protected moveTarget:  Vector;
+  protected speedLinear: number;
+  protected speedTurn:   number;
 
-  private clickTarget: Vector;
+  // Expandable tail
+  protected tail: DynamicList;
 
-  private renderer: Renderer;
-  private id: number;
-  private idClickTarget: number;
+  // Display parameters
+  //
+  protected renderer: Renderer;
+  protected id: number;
 
-  private rotMatrix: Matrix;
+  // Animation parameters
+  //
+  protected wiggle: number;
+  protected turn: number;
 
-  private wiggle: number;
-  private turn: number;
+  protected isTurning: boolean;
+  protected turnDirection: number;
 
-  private isTurning: boolean;
-  private turnDirection: number;
+  protected rotMatrix: Matrix;
 
-  private tail: DynamicList;
-
-  constructor( renderer:Renderer, position:VectorAreal =new VectorAreal(), speedLinear:number =0.2, speedTurn:number =1.5 ) {
+  // Make a new creature
+  //
+  constructor( renderer:    Renderer,
+               position:    VectorAreal  = new VectorAreal(0.0, 0.0, 0.01),
+               speedLinear: number       = 0.2,
+               speedTurn:   number       = 1.5,
+               lengthTail:  number       = 5 )
+  {
     this.position = position.copyAreal();
     this.velocity = new Vector(1.0, 0.0);
 
+    this.moveTarget  = new Vector();
     this.speedLinear = speedLinear;
     this.speedTurn   = speedTurn;
 
@@ -63,34 +77,22 @@ class GameObjectDragon implements GameObject {
         this.position, this.position.areal
     );
 
-    this.idClickTarget = this.renderer.add(
-        RendererObjectType.SPRITE, "circle.png",
-        new Vector(), 0.05
-    );
-
-    this.target( new Vector() );
-
-    window.addEventListener('click', (e) => {
-      var clickPosition: Vector = new Vector(e.clientX, e.clientY);
-      this.target( renderer.unproject(clickPosition) );
-    });
-
     this.tail = new DynamicList( renderer, this.position, this.velocity );
-    for(var i=0; i<5; i++) this.tail.append();
+    for(var i=0; i<lengthTail; i++) this.tail.append();
   }
 
-  // Target waypoint
+  // Creature eats a consumable
   //
-  private target(v: Vector) {
-    this.clickTarget = v;
-    this.renderer.position( this.idClickTarget, this.clickTarget );
+  eat( consumable: GameObjectConsumable ) {
+    var value = consumable.consume();
+    for(var i=0; i<value; i++) this.tail.append();
   }
 
-  // Animate the dragon
+  // Animate the creature
   //
   animate(dt: number): void {
-    var targetVelocity = Vector.norm( Vector.minus(this.clickTarget, this.position) );
-    var targetDistance = Vector.minus(this.position, this.clickTarget).distance();
+    var targetVelocity = Vector.norm( Vector.minus(this.moveTarget, this.position) );
+    var targetDistance = Vector.minus(this.position, this.moveTarget).distance();
 
     // If target approached, add [+1; -1] rotation bias
     if( targetDistance >= 0.1 ) {
@@ -124,7 +126,7 @@ class GameObjectDragon implements GameObject {
       this.velocity = targetVelocity.copy();
     }
 
-    // Cut tail at nearest intersection with dragon's head
+    // Cut tail at nearest intersection with the creature's head
     if( this.tail.getCount() > 2 ) {
         var nearest: DynamicList = this.tail.getNext(2).getNearest( this.position );
 
@@ -148,38 +150,27 @@ class GameObjectDragon implements GameObject {
     return [];
   }
 
-  // Remove the dragon
+  // Remove the creature
   //
   remove(): void {
     this.renderer.remove(this.id);
-    this.renderer.remove(this.idClickTarget);
   }
 
   // Perceive another object
   //
   perceive( another: GameObject ): void {
-    if( another instanceof GameObjectConsumable ) {
-      this.eat(<GameObjectConsumable> another);
-    }
-  }
-
-  // Dragon eats another object
-  //
-  eat( consumable: GameObjectConsumable ) {
-    var value = consumable.consume();
-    for(var i=0; i<value; i++) this.tail.append();
   }
 
   // Get position
   //
-  getPosition(): Vector {
+  getPosition(): VectorAreal {
     return this.position;
   }
 
   // Get perceive distance
   //
   getPreceiveDistance(): number {
-    return this.position.areal * 1.5;
+    return 0.0;
   }
 
   // Is object alive
@@ -191,6 +182,6 @@ class GameObjectDragon implements GameObject {
   // Is object perceiving
   //
   isPerceptive() {
-    return true;
+    return false;
   }
 }

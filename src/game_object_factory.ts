@@ -83,7 +83,7 @@ class GameObjectFactory implements GameObject {
 
   // Position at the centre of gameplay area, and percieve the entire area
   //
-  getPosition(): Vector { return new Vector(); }
+  getPosition(): VectorAreal { return new VectorAreal(); }
   getPreceiveDistance(): number { return 1.0; }
 
   // Always alive and perceiving

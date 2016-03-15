@@ -14,7 +14,7 @@
 // Object consumable by the player's dragon
 //
 class GameObjectConsumable implements GameObject {
-  private position: Vector;
+  private position: VectorAreal;
   private velocity: Vector;
 
   private renderer: Renderer;
@@ -24,7 +24,10 @@ class GameObjectConsumable implements GameObject {
 
   private value: number;
 
-  constructor(renderer: Renderer, position: Vector = new Vector(), value: number =1.0) {
+  constructor( renderer: Renderer,
+               position: VectorAreal  = new VectorAreal(0.0, 0.0, 0.01),
+               value:    number       = 1.0)
+  {
     this.position = position;
     this.velocity = new Vector();
 
@@ -40,8 +43,8 @@ class GameObjectConsumable implements GameObject {
   //
   animate(dt: number): void {
     this.swing += dt * 3.0;
-    this.position = Vector.plus( this.position, Vector.scale(this.velocity, dt) );
-    this.position.y += Math.sin( this.swing )*0.001;
+    this.position.x += this.velocity.x*dt;
+    this.position.y += this.velocity.x*dt + Math.sin( this.swing )*0.001;
 
     this.renderer.position( this.id, this.position );
   }
@@ -72,7 +75,7 @@ class GameObjectConsumable implements GameObject {
 
   // Get position
   //
-  getPosition(): Vector {
+  getPosition(): VectorAreal {
     return this.position;
   }
 

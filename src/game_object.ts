@@ -7,7 +7,7 @@
   http://www.atanaslaskov.com/golden/
 */
 
-/// <reference path="vector.ts" />
+/// <reference path="vector_areal.ts" />
 /// <reference path="renderer.ts" />
 
 // Abstract game object
@@ -18,7 +18,7 @@ interface GameObject {
   spawn(): GameObject[];
   remove(): void;
 
-  getPosition(): Vector;
+  getPosition(): VectorAreal;
   getPreceiveDistance(): number;
 
   isAlive(): boolean;
