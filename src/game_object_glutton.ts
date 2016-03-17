@@ -43,17 +43,17 @@ class GameObjectGlutton extends GameObjectCreature {
   // Perceive something
   //
   perceive( another: GameObject ): void {
-    // Perceive the player
+    // Perceive another creature
     //
-    if( another instanceof GameObjectPlayer ) {
+    if( another instanceof GameObjectCreature ) {
 
       var pos: Vector = this.getPosition();
-      var nearest: Vector = (<GameObjectPlayer> another).getNearestPosition(pos);
+      var nearest: Vector = (<GameObjectCreature> another).getNearestPosition(pos);
       var posToPlayer: Vector = Vector.minus( another.getPosition(), pos );
 
       var d: number = posToPlayer.distance();
 
-      // Evade the player
+      // Evade the creature
       if( d <= GameObjectGlutton.distanceEvade ) {
         var evade: Vector = Vector.scale( posToPlayer, GameObjectGlutton.distanceEvade/d );
 
