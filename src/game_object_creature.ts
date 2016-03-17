@@ -161,10 +161,16 @@ class GameObjectCreature implements GameObject {
   perceive( another: GameObject ): void {
   }
 
-  // Get position
+  // Get head position
   //
   getPosition(): VectorAreal {
     return this.position;
+  }
+
+  // Get nearest position in the tail
+  //
+  getNearestPosition( position: Vector ) {
+    return this.tail.getNearest(position).getPosition();
   }
 
   // Get perceive distance
