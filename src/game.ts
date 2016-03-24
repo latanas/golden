@@ -35,7 +35,7 @@ class Game {
       new GameObjectFactory( renderer ),
       new GameObjectPlayer( renderer, new VectorAreal(0.0, 0.4, 0.06) ),
       new GameObjectGlutton( renderer, new VectorAreal(0.0, -0.4, 0.03) ),
-      new GameObjectGlutton( renderer, new VectorAreal(0.4, 0.0, 0.03) )
+      new GameObjectGlutton( renderer, new VectorAreal(0.4, 0.0, 0.03) ),
       new GameObjectGlutton( renderer, new VectorAreal(-0.4, -0.0, 0.03) )
     ]);
   }

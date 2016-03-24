@@ -109,13 +109,16 @@ class DynamicList {
 
   // Append to DynamicList
   //
-  append() {
+  append(n: number = 1) {
+    if( n <= 0 ) return;
+
     if(this.next) {
-      this.next.append();
+      this.next.append(n);
     }
     else {
      this.next = new DynamicList( this.renderer, this.position, this.velocity );
      this.next.prev = this;
+     this.append(n-1);
     }
   }
 

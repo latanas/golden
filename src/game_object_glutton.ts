@@ -28,7 +28,7 @@ class GameObjectGlutton extends GameObjectCreature {
                speedLinear: number       = 0.15,
                speedTurn:   number       = 3.0 )
   {
-    super( renderer, position, speedLinear, speedTurn, 3 );
+    super( renderer, position, speedLinear, speedTurn, 1 );
 
     this.isEvasive    = false;
     this.distanceMin  = GameObjectGlutton.distanceMax;
@@ -86,6 +86,22 @@ class GameObjectGlutton extends GameObjectCreature {
           this.distanceMin = GameObjectGlutton.distanceMax;
         }
       }
+    }
+  }
+
+  // Glutton eats an apple
+  //
+  eat( consumable: GameObjectConsumable ) {
+    super.eat(consumable);
+
+    if( this.tail.getCount() > 6)
+    {
+      this.tail.truncate();
+
+      var posChild = this.tail.getPosition();
+      var child = new GameObjectGlutton( this.renderer, posChild );
+
+      this.spawnPending.push( child );
     }
   }
 

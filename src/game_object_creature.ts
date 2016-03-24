@@ -47,6 +47,9 @@ class GameObjectCreature implements GameObject {
 
   protected rotMatrix: Matrix;
 
+  // Spawned children
+  protected spawnPending: GameObject[];
+
   // Make a new creature
   //
   constructor( renderer:    Renderer,
@@ -78,7 +81,9 @@ class GameObjectCreature implements GameObject {
     );
 
     this.tail = new DynamicList( renderer, this.position, this.velocity );
-    for(var i=0; i<lengthTail; i++) this.tail.append();
+    this.tail.append( lengthTail-1 );
+
+    this.spawnPending = [];
   }
 
   // Creature eats a consumable
@@ -147,7 +152,12 @@ class GameObjectCreature implements GameObject {
   // Spawn new objects
   //
   spawn(): GameObject[] {
-    return [];
+    var sp = this.spawnPending;
+
+    if( this.spawnPending.length ) {
+      this.spawnPending = [];
+    }
+    return sp;
   }
 
   // Remove the creature
