@@ -56,8 +56,6 @@ class ThreeRenderer implements Renderer {
   private scene:    THREE.Scene;
   private textureLoader: THREE.TextureLoader;
 
-  private idNext: number;
-
   private fadeSpeed:   number;
   private fadeInList:  SlotList;
   private fadeOutList: SlotList;
@@ -65,8 +63,6 @@ class ThreeRenderer implements Renderer {
   // Construct renderer
   //
   constructor() {
-    this.idNext = 1;
-
     this.width  = window.innerWidth;
     this.height = window.innerHeight;
     this.scale  = Math.min(this.width, this.height);
@@ -109,7 +105,7 @@ class ThreeRenderer implements Renderer {
   }
 
   private get(id: number): THREE.Object3D {
-      return this.scene.getObjectByName("object" + id);
+      return this.scene.getObjectById(id);
   }
 
   // Add an object
@@ -143,10 +139,8 @@ class ThreeRenderer implements Renderer {
     obj.material.opacity = 0.0;
     this.fadeInList.enlist(obj);
 
-    obj.name = "object" + this.idNext;
     this.scene.add( obj );
-
-    return this.idNext++;
+    return obj.id;
   }
 
   // Remove an object
@@ -154,7 +148,7 @@ class ThreeRenderer implements Renderer {
       var obj: THREE.Mesh  = <THREE.Mesh> this.get(id);
 
       var idFade: number = this.fadeInList.find(obj);
-      if( idFade >= 0 ) this.fadeInList.remove(id);
+      if( idFade >= 0 ) this.fadeInList.remove(idFade);
 
       this.fadeOutList.enlist(obj);
   }
@@ -218,15 +212,13 @@ class ThreeRenderer implements Renderer {
 
     // Fade out objects
     this.fadeOutList.each( (obj: THREE.Mesh, id: number) => {
-      var opacity = obj.material.opacity - opacityDelta;
-
-      if( opacity > 0.0 ) {
-          obj.material.opacity = opacity;
+      if( obj.material.opacity > opacityDelta ) {
+          obj.material.opacity -= opacityDelta;
       }
       else {
         obj.material.opacity = 0.0;
         this.fadeOutList.remove(id);
-        this.scene.remove(obj);
+        this.scene.remove( this.get(obj.id) );
       }
     });
   }

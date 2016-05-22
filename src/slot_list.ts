@@ -47,7 +47,7 @@ class SlotList {
   //
   remove( id: number )
   {
-    if( id >= this.items.length ) return null;
+    if( id >= this.items.length ) return;
     this.items[id] = null;
   }
 
