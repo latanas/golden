@@ -70,7 +70,7 @@ class GameObjectConsumable implements GameObject {
   // Remove the consumable
   //
   remove(): void {
-    this.renderer.remove(this.id);
+    this.renderer.remove(this.id, true);
   }
 
   // Get position

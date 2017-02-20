@@ -73,6 +73,17 @@ class DynamicList {
       return dl;
   }
 
+  // Get last item
+  //
+  getLast(): DynamicList {
+      var dl: DynamicList = this;
+
+      while( dl.next ) {
+          dl = dl.next;
+      }
+      return dl;
+  }
+
   // Get previous element
   //
   getPrevious(n: number =1): DynamicList {
@@ -128,7 +139,7 @@ class DynamicList {
       var dl: DynamicList = this.next;
 
       while( dl ) {
-          this.renderer.remove(dl.id);
+          this.renderer.remove(dl.id, false);
           dl = dl.next;
       }
       this.next = null;

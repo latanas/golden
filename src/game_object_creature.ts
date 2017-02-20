@@ -56,10 +56,11 @@ class GameObjectCreature implements GameObject {
                position:    VectorAreal  = new VectorAreal(0.0, 0.0, 0.01),
                speedLinear: number       = 0.2,
                speedTurn:   number       = 1.5,
-               lengthTail:  number       = 5 )
+               segments:    number       = 5,
+               velocity:    Vector       = new Vector(1.0, 0.0) )
   {
     this.position = position.copyAreal();
-    this.velocity = new Vector(1.0, 0.0);
+    this.velocity = velocity;
 
     this.moveTarget  = new Vector();
     this.speedLinear = speedLinear;
@@ -81,7 +82,7 @@ class GameObjectCreature implements GameObject {
     );
 
     this.tail = new DynamicList( renderer, this.position, this.velocity );
-    this.tail.append( lengthTail-1 );
+    this.tail.append( segments );
 
     this.spawnPending = [];
   }
@@ -163,7 +164,7 @@ class GameObjectCreature implements GameObject {
   // Remove the creature
   //
   remove(): void {
-    this.renderer.remove(this.id);
+    this.renderer.remove(this.id, true);
   }
 
   // Perceive another object

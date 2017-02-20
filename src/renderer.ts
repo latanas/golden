@@ -24,7 +24,7 @@ interface Renderer {
   add(type: RendererObjectType, file: string, position: Vector, size: number): number;
 
   // Remove an object
-  remove(id: number);
+  remove(id: number, fadeOut: boolean);
 
   // Position an object
   position(id: number, position: Vector);
@@ -144,13 +144,19 @@ class ThreeRenderer implements Renderer {
   }
 
   // Remove an object
-  remove(id: number) {
+  remove(id: number, fadeOut: boolean) {
       var obj: THREE.Mesh  = <THREE.Mesh> this.get(id);
 
       var idFade: number = this.fadeInList.find(obj);
       if( idFade >= 0 ) this.fadeInList.remove(idFade);
 
-      this.fadeOutList.enlist(obj);
+      if( fadeOut ) {
+        this.fadeOutList.enlist(obj);
+      }
+      else {
+        this.scene.remove( this.get(obj.id) );
+      }
+
   }
 
   // Position an object

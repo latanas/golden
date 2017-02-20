@@ -52,7 +52,7 @@ class GameObjectPlayer extends GameObjectCreature {
   //
   remove(): void {
     super.remove();
-    this.renderer.remove(this.idMoveTarget);
+    this.renderer.remove(this.idMoveTarget, true);
   }
 
   // Perceive another object
