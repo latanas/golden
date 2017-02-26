@@ -16,7 +16,7 @@ class GameObjectPlayer extends GameObjectCreature {
   private idMoveTarget: number;
 
   constructor( renderer:    Renderer,
-               position:    VectorAreal  = new VectorAreal(0.0, 0.0, 0.01),
+               position:    VectorAreal  = new VectorAreal(0.0, 0.0, 0.02),
                speedLinear: number       = 0.2,
                speedTurn:   number       = 1.5 )
   {
@@ -24,7 +24,7 @@ class GameObjectPlayer extends GameObjectCreature {
 
     this.idMoveTarget = this.renderer.add(
         RendererObjectType.SPRITE, "circle.png",
-        new Vector(), 0.05
+        new Vector(), 0.05, 0.05
     );
 
     this.target( new Vector() );

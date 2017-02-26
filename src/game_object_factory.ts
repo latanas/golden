@@ -39,7 +39,7 @@ class GameObjectFactory implements GameObject {
   }
 
   private makeConsumable(): GameObject {
-    var position = new VectorAreal( (Math.random()-0.5)*0.8, (Math.random()-0.5)*0.8, 0.05 );
+    var position = new VectorAreal( (Math.random()-0.5) * 0.8, (Math.random()-0.5) * 0.8, 0.1 );
     return new GameObjectConsumable( this.renderer, position );
   }
 

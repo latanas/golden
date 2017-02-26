@@ -37,6 +37,15 @@ class GameObjectCreature implements GameObject {
   protected renderer: Renderer;
   protected id: number;
 
+  private static rendererImageHead: string = "head.png";
+  private static rendererImageBody: string = "body.png";
+  private static rendererImageTail: string = "tail.png";
+
+  private static ratioHeadX : number = 4.5;
+  private static ratioHeadY : number = 4.5
+  private static ratioBody : number = 2.3;
+  private static ratioTail : number = 3.0;
+
   // Animation parameters
   //
   protected wiggle: number;
@@ -56,7 +65,7 @@ class GameObjectCreature implements GameObject {
                position:    VectorAreal  = new VectorAreal(0.0, 0.0, 0.01),
                speedLinear: number       = 0.2,
                speedTurn:   number       = 1.5,
-               segments:    number       = 5,
+               segments:    number       = 7,
                velocity:    Vector       = new Vector(1.0, 0.0) )
   {
     this.position = position.copyAreal();
@@ -77,21 +86,41 @@ class GameObjectCreature implements GameObject {
     this.renderer = renderer;
 
     this.id = this.renderer.add(
-        RendererObjectType.SPRITE, "arrow.png",
-        this.position, this.position.areal
+        RendererObjectType.SPRITE,
+        GameObjectCreature.rendererImageHead,
+        this.position,
+        this.position.areal * GameObjectCreature.ratioHeadX,
+        this.position.areal * GameObjectCreature.ratioHeadY
     );
+    this.renderer.positionz(this.id, 0.001);
 
-    this.tail = new DynamicList( renderer, this.position, this.velocity );
-    this.tail.append( segments );
+    this.tail = new DynamicList(
+        renderer, this.position,
+        this.velocity,
+        GameObjectCreature.rendererImageBody,
+        GameObjectCreature.ratioBody
+    );
+    this.append( segments );
 
     this.spawnPending = [];
+  }
+
+  // Append body segments whilst preserving the tail
+  //
+  private append(n: number): void {
+    this.tail.getLast().getPrevious().truncate();
+
+    for( var i = 0; i < n; i++ ) {
+      this.tail.append( 1, GameObjectCreature.rendererImageBody, GameObjectCreature.ratioBody );
+    }
+    this.tail.append( 1, GameObjectCreature.rendererImageTail, GameObjectCreature.ratioTail );
+    this.renderer.positionz(this.tail.getLast().getID(), -0.001);
   }
 
   // Creature eats a consumable
   //
   eat( consumable: GameObjectConsumable ) {
-    var value = consumable.consume();
-    for(var i=0; i<value; i++) this.tail.append();
+    this.append(consumable.consume());
   }
 
   // Animate the creature
@@ -104,10 +133,10 @@ class GameObjectCreature implements GameObject {
     if( targetDistance >= 0.1 ) {
         this.isTurning = false;
         this.turn      = 0.0;
-        this.wiggle   += dt*2.0;
+        this.wiggle   += dt * 2.0;
     }
     else if( this.isTurning ) {
-        this.turn += dt*this.turnDirection*0.5;
+        this.turn += dt * this.turnDirection * 0.5;
     }
     else {
         this.isTurning      = true;
@@ -136,8 +165,10 @@ class GameObjectCreature implements GameObject {
     if( this.tail.getCount() > 2 ) {
         var nearest: DynamicList = this.tail.getNext(2).getNearest( this.position );
 
-        if( nearest.getPosition().isIntersected(this.position) )
-            nearest.getPrevious().truncate();
+        if( nearest.getPosition().isIntersected(this.position) ) {
+          nearest.getPrevious().getPrevious().truncate();
+          this.append(0);
+        }
     }
 
     // Update position and rotation

@@ -21,13 +21,16 @@ enum RendererObjectType {
 //
 interface Renderer {
   // Add an object
-  add(type: RendererObjectType, file: string, position: Vector, size: number): number;
+  add(type: RendererObjectType, file: string, position: Vector, w: number, h: number): number;
 
   // Remove an object
   remove(id: number, fadeOut: boolean);
 
   // Position an object
   position(id: number, position: Vector);
+
+  // Postion object z zindex
+  positionz(id: number, zindex: number)
 
   // Rotate an object
   rotation(id: number, angle: number);
@@ -99,6 +102,8 @@ class ThreeRenderer implements Renderer {
     light2.position.set( +1.0, -1.0, -0.5 );
     this.scene.add( light2 );
 
+    //this.renderer.setClearColor( new THREE.Color(255,255,255) );
+
     this.fadeSpeed    = 1.5;
     this.fadeInList   = new SlotList();
     this.fadeOutList  = new SlotList();
@@ -110,7 +115,7 @@ class ThreeRenderer implements Renderer {
 
   // Add an object
   //
-  add(type: RendererObjectType, file: string, position: Vector, size: number): number {
+  add(type: RendererObjectType, file: string, position: Vector, w: number, h: number): number {
     var obj = null;
 
     if( type == RendererObjectType.SPRITE ) {
@@ -132,9 +137,9 @@ class ThreeRenderer implements Renderer {
     obj.position.y =  position.y;
     obj.position.z = 0.0;
 
-    obj.scale.x = size;
-    obj.scale.y = size;
-    obj.scale.z = size;
+    obj.scale.x = w;
+    obj.scale.y = h;
+    obj.scale.z = h;
 
     obj.material.opacity = 0.0;
     this.fadeInList.enlist(obj);
@@ -165,7 +170,13 @@ class ThreeRenderer implements Renderer {
     var obj: THREE.Object3D = this.get(id);
     obj.position.x = position.x;
     obj.position.y = position.y;
-    obj.position.z = 0.0;
+  }
+
+  // Position an object
+  //
+  positionz(id: number, zindex: number) {
+    var obj: THREE.Object3D = this.get(id);
+    obj.position.z = zindex;
   }
 
   // Rotate an object

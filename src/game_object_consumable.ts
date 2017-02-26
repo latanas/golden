@@ -18,6 +18,8 @@ class GameObjectConsumable implements GameObject {
   private velocity: Vector;
 
   private renderer: Renderer;
+  private static rendererImageFile: string = "apple.png";
+  private static rendererImageRatio : number = 1.0;
 
   private id: number;
   private swing: number;
@@ -25,7 +27,7 @@ class GameObjectConsumable implements GameObject {
   private value: number;
 
   constructor( renderer: Renderer,
-               position: VectorAreal  = new VectorAreal(0.0, 0.0, 0.01),
+               position: VectorAreal  = new VectorAreal(0.0, 0.0, 0.006),
                value:    number       = 1.0)
   {
     this.position = position;
@@ -34,7 +36,13 @@ class GameObjectConsumable implements GameObject {
     this.swing = Math.random()*Math.PI;
 
     this.renderer = renderer;
-    this.id = this.renderer.add( RendererObjectType.MODEL, "apple.json", this.position, 0.03 );
+    this.id = this.renderer.add(
+      RendererObjectType.SPRITE,
+      GameObjectConsumable.rendererImageFile,
+      this.position,
+      position.areal * GameObjectConsumable.rendererImageRatio,
+      position.areal
+    );
 
     this.value = value;
   }

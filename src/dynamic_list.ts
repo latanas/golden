@@ -24,7 +24,7 @@ class DynamicList {
   private prev: DynamicList;
 
 
-  constructor(renderer: Renderer, position: VectorAreal =new VectorAreal(), velocity: Vector =new Vector()) {
+  constructor(renderer: Renderer, position: VectorAreal =new VectorAreal(), velocity: Vector =new Vector(), image: string, ratio: number) {
     var v = Vector.minus( position, Vector.scale(velocity, position.areal) );
 
     this.position = new VectorAreal(v.x, v.y, position.areal);
@@ -32,21 +32,27 @@ class DynamicList {
     this.renderer = renderer;
 
     this.id = this.renderer.add(
-        RendererObjectType.SPRITE, "arrow.png",
-        this.position, this.position.areal
+        RendererObjectType.SPRITE, image,
+        this.position, this.position.areal * ratio, this.position.areal
     );
 
     this.next = null;
     this.prev = null;
   }
 
-  // Get element position
+  // Get the element renderer identifer
+  //
+  getID(): number {
+      return this.id;
+  }
+
+  // Get the element position
   //
   getPosition(): VectorAreal {
       return this.position;
   }
 
-  // Get element count
+  // Get the element count
   //
   getCount() {
       var n:  number = 1;
@@ -59,7 +65,7 @@ class DynamicList {
       return n;
   }
 
-  // Get next element
+  // Get the next element
   //
   getNext(n: number =1): DynamicList {
       if( n<=0 ) return this;
@@ -73,7 +79,7 @@ class DynamicList {
       return dl;
   }
 
-  // Get last item
+  // Get the last item
   //
   getLast(): DynamicList {
       var dl: DynamicList = this;
@@ -84,7 +90,7 @@ class DynamicList {
       return dl;
   }
 
-  // Get previous element
+  // Get the previous element
   //
   getPrevious(n: number =1): DynamicList {
       if( n<=0 ) return this;
@@ -98,7 +104,7 @@ class DynamicList {
       return dl;
   }
 
-  // Get nearest segment
+  // Get the nearest segment
   //
   getNearest( position: Vector ): DynamicList {
       var distanceNearest: number = Vector.minus(this.position, position).distance();
@@ -118,18 +124,18 @@ class DynamicList {
       return dlNearest;
   }
 
-  // Append to DynamicList
+  // Append to the end of the DynamicList
   //
-  append(n: number = 1) {
+  append(n: number, image: string, ratio: number) {
     if( n <= 0 ) return;
 
     if(this.next) {
-      this.next.append(n);
+      this.next.append(n, image, ratio);
     }
     else {
-     this.next = new DynamicList( this.renderer, this.position, this.velocity );
+     this.next = new DynamicList( this.renderer, this.position, this.velocity, image, ratio );
      this.next.prev = this;
-     this.append(n-1);
+     this.append(n-1, image, ratio);
     }
   }
 

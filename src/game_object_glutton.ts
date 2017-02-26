@@ -17,7 +17,7 @@ class GameObjectGlutton extends GameObjectCreature {
   private static distanceMax:   number  = 5.0;
   private static distanceEvade: number  = 0.3;
 
-  private static matureLenght: number = 6;
+  private static matureLenght: number = 12;
 
   // Performing evasive move
   private isEvasive: boolean;
@@ -29,7 +29,7 @@ class GameObjectGlutton extends GameObjectCreature {
                position:    VectorAreal  = new VectorAreal(0.0, 0.0, 0.01),
                speedLinear: number       = 0.15,
                speedTurn:   number       = 3.0,
-               segments:    number       = 1,
+               segments:    number       = 3,
                velocity:    Vector       = new Vector(1.0, 0.0) )
   {
     super( renderer, position, speedLinear, speedTurn, segments, velocity );
@@ -98,7 +98,7 @@ class GameObjectGlutton extends GameObjectCreature {
   eat( consumable: GameObjectConsumable ) {
     super.eat(consumable);
 
-    if( this.tail.getCount()+1 >= GameObjectGlutton.matureLenght )
+    if( this.tail.getCount() + 1 >= GameObjectGlutton.matureLenght )
     {
       var childPosition = this.tail.getLast().getPosition();
       var divisionLenght = Math.floor(GameObjectGlutton.matureLenght / 2.0);
