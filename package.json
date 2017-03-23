@@ -1,29 +1,27 @@
 {
   "name": "golden",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Guide the dragon.",
   "repository": "https://github.com/latanas/golden.git",
-
   "homepage": "http://www.laskov.co.uk/golden/",
   "author": "Atanas Laskov <latanas@gmail.com>",
   "license": "BSD-2-Clause",
-
   "dependencies": {
-    "typescript": "^1.7.5",
-    "tsd": "^0.6.5",
-    "three": "^0.73.0",
-    "gulp": "^3.9.0",
-    "gulp-typescript": "^2.10.0",
-    "gulp-sourcemaps": "^1.6.0",
-    "gulp-concat": "^2.6.0",
-    "gulp-uglify": "^1.5.1",
-    "karma": "^0.13.16",
-    "karma-jasmine": "^0.3.6",
-    "jasmine-core": "2.4.1",
-    "karma-chrome-launcher": "^0.2.2"
+    "gulp": "github:gulpjs/gulp#4.0",
+    "gulp-concat": "^2.6.1",
+    "gulp-sourcemaps": "^2.4.1",
+    "gulp-typescript": "^3.1.6",
+    "gulp-uglify": "^1.4.2",
+    "jasmine-core": "^2.5.2",
+    "karma": "^1.5.0",
+    "karma-chrome-launcher": "^2.0.0",
+    "karma-jasmine": "^1.1.0",
+    "three": "^0.84.0",
+    "typescript": "^2.1.5",
+    "typings": "^2.1.0"
   },
   "scripts": {
-    "postinstall": "./node_modules/.bin/tsd install"
+    "postinstall": "./node_modules/.bin/typings install"
   },
   "private": true
 }

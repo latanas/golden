@@ -7,7 +7,7 @@
   http://www.atanaslaskov.com/golden/
 */
 
-/// <reference path="../typings/threejs/three.d.ts" />
+/// <reference path="../typings/globals/three/index.d.ts" />
 /// <reference path="vector.ts" />
 /// <reference path="slot_list.ts" />
 

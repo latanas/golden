@@ -7,7 +7,7 @@
   http://www.atanaslaskov.com/golden/
 */
 
-/// <reference path="../typings/jasmine/jasmine.d.ts" />
+/// <reference path="../typings/globals/jasmine/index.d.ts" />
 /// <reference path="../src/clock.ts" />
 
 describe("Clock", () => {

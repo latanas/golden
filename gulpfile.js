@@ -27,17 +27,19 @@ gulp.task('compile', function() {
 // Compile libraries
 //
 gulp.task('lib', function() {
-  return gulp.src("node_modules/three/three.js")
+  return gulp.src("node_modules/three/build/three.js")
     .pipe( gulp.dest("build") );
 });
 
-gulp.task("default", ["compile", "lib"]);
+// Default task is to compile and build libs
+//
+gulp.task("default", gulp.parallel("compile", "lib"));
 
 // Run unit tests
 //
 gulp.task('test-compile', function() {
   return gulp.src([
-      "typings/jasmine/jasmine.d.ts",
+      "typings/globals/jasmine/index.d.ts",
       "spec/support/utils.ts",
       "spec/*.ts",
     ])
@@ -45,16 +47,16 @@ gulp.task('test-compile', function() {
     .pipe( ts({"out": "spec.js"}) ).js
     .pipe( sourcemaps.write() )
     .pipe( gulp.dest("spec/build") );
-
-    return merge(gameSource, gameTestSuite);
 });
 
-gulp.task('test', ['test-compile'], function( done ) {
+gulp.task('test-karma', function( done ) {
   new KarmaServer({
     configFile: __dirname + '/spec/karma.conf.js',
     singleRun: true
   }, done).start();
 });
+
+gulp.task('test', gulp.series('test-compile', 'test-karma'));
 
 // Minify the build
 //
