@@ -119,7 +119,11 @@ class ThreeRenderer implements Renderer {
     var obj = null;
 
     if( type == RendererObjectType.SPRITE ) {
-      var spriteMap = this.textureLoader.load( "assets/" + file );
+      let spriteMap: THREE.Texture = this.textureLoader.load( "assets/" + file );
+      spriteMap.magFilter = THREE.LinearFilter;
+      spriteMap.minFilter = THREE.LinearFilter;
+
+
       var spriteMaterial = new THREE.MeshBasicMaterial( {color: 0xffffff, map: spriteMap, transparent: true, depthTest: false} );
       var spriteGeometry = new THREE.PlaneBufferGeometry( 1.0, 1.0, 1, 1 );
 

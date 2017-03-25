@@ -18,8 +18,8 @@ class GameObjectConsumable implements GameObject {
   private velocity: Vector;
 
   private renderer: Renderer;
-  private static rendererImageFile: string = "apple.png";
-  private static rendererImageRatio : number = 1.0;
+  private static readonly rendererImageFile: string = "apple.png";
+  private static readonly rendererImageRatio : number = 1.0;
 
   private id: number;
   private swing: number;

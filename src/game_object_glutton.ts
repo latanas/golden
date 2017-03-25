@@ -14,10 +14,9 @@
 // The glutton finds apples and eats them
 //
 class GameObjectGlutton extends GameObjectCreature {
-  private static distanceMax:   number  = 5.0;
-  private static distanceEvade: number  = 0.3;
-
-  private static matureLenght: number = 12;
+  private static readonly distanceMax:   number  = 5.0;
+  private static readonly distanceEvade: number  = 0.3;
+  private static readonly matureLenght: number = 12;
 
   // Performing evasive move
   private isEvasive: boolean;

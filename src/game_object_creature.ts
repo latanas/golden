@@ -12,7 +12,8 @@
 
 /// <reference path="renderer.ts" />
 
-/// <reference path="dynamic_list.ts" />
+/// <reference path="dynamic_list_elastic.ts" />
+/// <reference path="dynamic_list_posed.ts" />
 
 /// <reference path="game_object.ts" />
 /// <reference path="game_object_consumable.ts" />
@@ -37,14 +38,14 @@ class GameObjectCreature implements GameObject {
   protected renderer: Renderer;
   protected id: number;
 
-  private static rendererImageHead: string = "head.png";
-  private static rendererImageBody: string = "body.png";
-  private static rendererImageTail: string = "tail.png";
+  private static readonly rendererImageHead: string = "head.png";
+  private static readonly rendererImageBody: string = "body.png";
+  private static readonly rendererImageTail: string = "tail.png";
 
-  private static ratioHeadX : number = 4.5;
-  private static ratioHeadY : number = 4.5
-  private static ratioBody : number = 2.3;
-  private static ratioTail : number = 3.0;
+  private static readonly ratioHeadX : number = 4.5;
+  private static readonly ratioHeadY : number = 4.5
+  private static readonly ratioBody : number = 2.3;
+  private static readonly ratioTail : number = 3.0;
 
   // Animation parameters
   //
@@ -94,9 +95,9 @@ class GameObjectCreature implements GameObject {
     );
     this.renderer.positionz(this.id, 0.001);
 
-    this.tail = new DynamicList(
-        renderer, this.position,
-        this.velocity,
+    this.tail = new DynamicListElastic(
+        this.position, this.velocity,
+        renderer,
         GameObjectCreature.rendererImageBody,
         GameObjectCreature.ratioBody
     );
@@ -108,13 +109,24 @@ class GameObjectCreature implements GameObject {
   // Append body segments whilst preserving the tail
   //
   private append(n: number): void {
-    this.tail.getLast().getPrevious().truncate();
-
     for( var i = 0; i < n; i++ ) {
       this.tail.append( 1, GameObjectCreature.rendererImageBody, GameObjectCreature.ratioBody );
     }
-    this.tail.append( 1, GameObjectCreature.rendererImageTail, GameObjectCreature.ratioTail );
-    this.renderer.positionz(this.tail.getLast().getID(), -0.001);
+    this.appendTailBranch();
+  }
+
+  // Append the tail as a "branch" of the last segment
+  //
+  private appendTailBranch() {
+    let tailBranch: DynamicList = new DynamicListPosed(
+      this.tail.getLast().getPosition(),
+      new Vector(-1.50 * this.position.areal, 0.0),
+      this.renderer,
+      GameObjectCreature.rendererImageTail,
+      GameObjectCreature.ratioTail );
+
+    this.tail.getLast().appendBranch(tailBranch);
+    this.renderer.positionz(tailBranch.getID(), -0.001);
   }
 
   // Creature eats a consumable
@@ -166,8 +178,8 @@ class GameObjectCreature implements GameObject {
         var nearest: DynamicList = this.tail.getNext(2).getNearest( this.position );
 
         if( nearest.getPosition().isIntersected(this.position) ) {
-          nearest.getPrevious().getPrevious().truncate();
-          this.append(0);
+          nearest.getPrevious().truncate();
+          this.appendTailBranch();
         }
     }
 

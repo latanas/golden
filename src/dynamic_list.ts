@@ -1,6 +1,6 @@
 /*
   Project: Golden
-  Author:  Copyright (C) 2015, Atanas Laskov
+  Author:  Copyright (C) 2017, Atanas Laskov
 
   License: BSD license, see LICENSE for more details.
 
@@ -11,160 +11,175 @@
 /// <reference path="matrix.ts" />
 /// <reference path="renderer.ts" />
 
-// Linked list with the ability to propagate motion slowly to its elements.
+// Linked list with the ability to propagate velocity
 //
-class DynamicList {
-  private position: VectorAreal;
-  private velocity: Vector;
+abstract class DynamicList {
+    protected position: VectorAreal;
+    protected velocity;
 
-  private renderer: Renderer;
-  private id: number;
+    protected renderer: Renderer;
+    protected image: string;
+    protected imageRatio: number;
+    protected id: number;
 
-  private next: DynamicList;
-  private prev: DynamicList;
+    protected next: DynamicList;
+    protected prev: DynamicList;
+    protected branches: DynamicList[];
 
+    constructor(position: VectorAreal, velocity: Vector, renderer: Renderer, image: string, imageRatio: number) {
+        this.position = position.copy();
+        this.velocity = velocity.copy();
 
-  constructor(renderer: Renderer, position: VectorAreal =new VectorAreal(), velocity: Vector =new Vector(), image: string, ratio: number) {
-    var v = Vector.minus( position, Vector.scale(velocity, position.areal) );
+        this.renderer = renderer;
+        this.image = image;
+        this.imageRatio = imageRatio;
 
-    this.position = new VectorAreal(v.x, v.y, position.areal);
-    this.velocity = velocity.copy();
-    this.renderer = renderer;
+        this.id = this.renderer.add(
+            RendererObjectType.SPRITE, image,
+            this.position, this.position.areal * imageRatio, this.position.areal
+        );
 
-    this.id = this.renderer.add(
-        RendererObjectType.SPRITE, image,
-        this.position, this.position.areal * ratio, this.position.areal
-    );
-
-    this.next = null;
-    this.prev = null;
-  }
-
-  // Get the element renderer identifer
-  //
-  getID(): number {
-      return this.id;
-  }
-
-  // Get the element position
-  //
-  getPosition(): VectorAreal {
-      return this.position;
-  }
-
-  // Get the element count
-  //
-  getCount() {
-      var n:  number = 1;
-      var dl: DynamicList = this;
-
-      while( dl.next ) {
-          n++;
-          dl = dl.next;
-      }
-      return n;
-  }
-
-  // Get the next element
-  //
-  getNext(n: number =1): DynamicList {
-      if( n<=0 ) return this;
-
-      var dl: DynamicList = this;
-
-      while(n--) {
-          if( !dl.next ) return dl;
-          dl = dl.next;
-      }
-      return dl;
-  }
-
-  // Get the last item
-  //
-  getLast(): DynamicList {
-      var dl: DynamicList = this;
-
-      while( dl.next ) {
-          dl = dl.next;
-      }
-      return dl;
-  }
-
-  // Get the previous element
-  //
-  getPrevious(n: number =1): DynamicList {
-      if( n<=0 ) return this;
-
-      var dl: DynamicList = this;
-
-      while(n--) {
-          if( !dl.prev ) return dl;
-          dl = dl.prev;
-      }
-      return dl;
-  }
-
-  // Get the nearest segment
-  //
-  getNearest( position: Vector ): DynamicList {
-      var distanceNearest: number = Vector.minus(this.position, position).distance();
-
-      var dlNearest: DynamicList  = this;
-      var dlNext:    DynamicList  = this.next;
-
-      while( dlNext ) {
-          var d: number = Vector.minus( dlNext.position, position ).distance();
-
-          if( d < distanceNearest ) {
-              distanceNearest  = d;
-              dlNearest        = dlNext;
-          }
-          dlNext = dlNext.next;
-      }
-      return dlNearest;
-  }
-
-  // Append to the end of the DynamicList
-  //
-  append(n: number, image: string, ratio: number) {
-    if( n <= 0 ) return;
-
-    if(this.next) {
-      this.next.append(n, image, ratio);
+        this.next = null;
+        this.prev = null;
+        this.branches = new Array<DynamicList>();
     }
-    else {
-     this.next = new DynamicList( this.renderer, this.position, this.velocity, image, ratio );
-     this.next.prev = this;
-     this.append(n-1, image, ratio);
+
+    // Get the element renderer identifer
+    //
+    getID(): number {
+        return this.id;
     }
-  }
 
-  // Truncate the DynamicList
-  //
-  truncate() {
-      var dl: DynamicList = this.next;
+    // Get the element position
+    //
+    getPosition(): VectorAreal {
+        return this.position;
+    }
 
-      while( dl ) {
-          this.renderer.remove(dl.id, false);
-          dl = dl.next;
-      }
-      this.next = null;
-  }
+    // Get the element velocity
+    //
+    getVelocity(): Vector {
+        return this.velocity;
+    }
 
-  // Follow an object
-  //
-  follow( positionFollow: Vector, speedFollow: number, dt: number ): void {
-    var distanceDelta          = Vector.minus( positionFollow, this.position ).distance();
-    var elasticitySpeed        = Math.max(-1.0, Math.min(1.0, distanceDelta-this.position.areal))*speedFollow*3.5;
-    var distanceAdjustedSpeed  = speedFollow + elasticitySpeed;
+    // Get the element count
+    //
+    getCount() {
+        var n:  number = 1;
+        var dl: DynamicList = this;
 
-    this.velocity = Vector.norm( Vector.minus( positionFollow, this.position) );
-    this.position.set( Vector.plus(this.position, Vector.scale(this.velocity, distanceAdjustedSpeed*dt)) );
+        while( dl.next ) {
+            n++;
+            dl = dl.next;
+        }
+        return n;
+    }
 
-    this.renderer.position( this.id, this.position );
-    this.renderer.rotation( this.id, this.velocity.angle() );
+    // Get the next element
+    //
+    getNext(n: number =1): DynamicList {
+        if( n<=0 ) return this;
 
-    // Propagate movement down the DynamicList
-    if( this.next ) this.next.follow( this.position, distanceAdjustedSpeed, dt );
-  }
+        var dl: DynamicList = this;
+
+        while(n--) {
+            if( !dl.next ) return dl;
+            dl = dl.next;
+        }
+        return dl;
+    }
+
+    // Get the last element
+    //
+    getLast(): DynamicList {
+        var dl: DynamicList = this;
+
+        while( dl.next ) {
+            dl = dl.next;
+        }
+        return dl;
+    }
+
+    // Get the previous element
+    //
+    getPrevious(n: number =1): DynamicList {
+        if( n<=0 ) return this;
+
+        var dl: DynamicList = this;
+
+        while(n--) {
+            if( !dl.prev ) return dl;
+            dl = dl.prev;
+        }
+        return dl;
+    }
+
+    // Get the nearest segment
+    //
+    getNearest( position: Vector ): DynamicList {
+        var distanceNearest: number = Vector.minus(this.position, position).distance();
+
+        var dlNearest: DynamicList  = this;
+        var dlNext:    DynamicList  = this.next;
+
+        while( dlNext ) {
+            var d: number = Vector.minus( dlNext.position, position ).distance();
+
+            if( d < distanceNearest ) {
+                distanceNearest  = d;
+                dlNearest        = dlNext;
+            }
+            dlNext = dlNext.next;
+        }
+        return dlNearest;
+    }
+
+    // Get all branches at this segment
+    //
+    getBranches(): DynamicList[] {
+        return this.branches;
+    }
+
+    // Append to the end of the DynamicList
+    //
+    append(n: number, image: string, ratio: number) {
+        if( n <= 0 ) return;
+
+        if(this.next) {
+            this.next.append(n, image, ratio);
+        }
+        else {
+            this.next = this.copy();
+            this.next.prev = this;
+            this.append(n-1, image, ratio);
+        }
+    }
+
+    // Append a branch
+    //
+    appendBranch(branch: DynamicList) {
+        branch.prev = this;
+        this.branches.push(branch);
+    }
+
+    // Truncate the DynamicList
+    //
+    truncate() {
+        let dl: DynamicList = this.next;
+
+        while( dl ) {
+            for( let branch of dl.getBranches() ) {
+                this.renderer.remove(branch.id, false);
+            }
+            this.renderer.remove(dl.id, false);
+            dl = dl.next;
+        }
+        this.next = null;
+    }
+
+    // Make a copy
+    abstract copy(): DynamicList;
+
+    // Follow an object
+    abstract follow( positionFollow: Vector, speedFollow: number, dt: number ): void;
 }

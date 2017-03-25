@@ -19,6 +19,10 @@ class VectorAreal extends Vector {
         this.areal = areal;
     }
 
+    public copy(): VectorAreal {
+        return new VectorAreal(this.x, this.y, this.areal);
+    }
+
     public copyAreal(): VectorAreal {
         return new VectorAreal(this.x, this.y, this.areal);
     }
