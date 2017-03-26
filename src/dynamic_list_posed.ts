@@ -27,6 +27,10 @@ class DynamicListPosed extends DynamicList {
       super(position, new Vector(), renderer, image, imageRatio);
       this.angularSpeed = angularSpeed;
       this.pose = pose.copy();
+
+      this.id = this.renderer.add(
+            RendererObjectType.SPRITE_PIVOT_RIGHT, image,
+            this.position, this.position.areal * imageRatio, this.position.areal );
   }
 
   copy(): DynamicList {

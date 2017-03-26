@@ -34,11 +34,6 @@ abstract class DynamicList {
         this.image = image;
         this.imageRatio = imageRatio;
 
-        this.id = this.renderer.add(
-            RendererObjectType.SPRITE, image,
-            this.position, this.position.areal * imageRatio, this.position.areal
-        );
-
         this.next = null;
         this.prev = null;
         this.branches = new Array<DynamicList>();

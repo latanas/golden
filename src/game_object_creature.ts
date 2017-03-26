@@ -36,14 +36,16 @@ class GameObjectCreature implements GameObject {
   // Display parameters
   //
   protected renderer: Renderer;
-  protected id: number;
 
-  private static readonly rendererImageHead: string = "head.png";
+  private static readonly rendererImageHead: string = "headElement0.png";
+  private static readonly rendererImageHeadElement1: string = "headElement1.png";
+  private static readonly rendererImageHeadElement2: string = "headElement2.png";
+  private static readonly rendererImageHeadElement3: string = "headElement3.png";
+
   private static readonly rendererImageBody: string = "body.png";
   private static readonly rendererImageTail: string = "tail.png";
 
-  private static readonly ratioHeadX : number = 4.5;
-  private static readonly ratioHeadY : number = 4.5
+  private static readonly ratioHead : number = 2.0;
   private static readonly ratioBody : number = 2.3;
   private static readonly ratioTail : number = 3.0;
 
@@ -85,16 +87,6 @@ class GameObjectCreature implements GameObject {
     this.turnDirection = +1;
 
     this.renderer = renderer;
-
-    this.id = this.renderer.add(
-        RendererObjectType.SPRITE,
-        GameObjectCreature.rendererImageHead,
-        this.position,
-        this.position.areal * GameObjectCreature.ratioHeadX,
-        this.position.areal * GameObjectCreature.ratioHeadY
-    );
-    this.renderer.positionz(this.id, 0.001);
-
     this.tail = new DynamicListElastic(
         this.position, this.velocity,
         renderer,
@@ -102,6 +94,7 @@ class GameObjectCreature implements GameObject {
         GameObjectCreature.ratioBody
     );
     this.append( segments );
+    this.appendHeadBranches();
 
     this.spawnPending = [];
   }
@@ -115,13 +108,57 @@ class GameObjectCreature implements GameObject {
     this.appendTailBranch();
   }
 
-  // Append the tail as a "branch" of the last segment
+  // Append the head's decoraive branches
+  //
+  private appendHeadBranches() {
+    let headElements: DynamicList[] = new Array<DynamicList>();
+
+    headElements.push( new DynamicListPosed(
+      new VectorAreal( this.position.x, this.position.y, this.position.areal * 2.0 ),
+      new Vector(+1.8 * this.position.areal, +0.0 * this.position.areal),
+      Math.PI * 6.0,
+      this.renderer,
+      GameObjectCreature.rendererImageHead,
+      GameObjectCreature.ratioHead ));
+
+    headElements.push( new DynamicListPosed(
+      new VectorAreal( this.position.x, this.position.y, this.position.areal * 2.6 ),
+      new Vector(0.0 * this.position.areal, +1.0 * this.position.areal),
+      Math.PI * 1.8,
+      this.renderer,
+      GameObjectCreature.rendererImageHeadElement1,
+      GameObjectCreature.ratioTail * 0.6 ));
+
+    headElements.push( new DynamicListPosed(
+      new VectorAreal( this.position.x, this.position.y, this.position.areal * 2.6 ),
+      new Vector(0.0 * this.position.areal, -1.0 * this.position.areal),
+      Math.PI * 1.8,
+      this.renderer,
+      GameObjectCreature.rendererImageHeadElement2,
+      GameObjectCreature.ratioTail * 0.6 ));
+
+    headElements.push( new DynamicListPosed(
+      new VectorAreal( this.position.x, this.position.y, this.position.areal * 0.5 ),
+      new Vector(+0.0 * this.position.areal, +0.0 * this.position.areal),
+      Math.PI * 2.5,
+      this.renderer,
+      GameObjectCreature.rendererImageHeadElement3,
+      GameObjectCreature.ratioTail * 1.4 ));
+
+    for(let element of headElements) {
+      this.tail.appendBranch(element);
+      this.renderer.positionz(element.getID(), +0.001);
+    }
+    this.renderer.positionz(headElements[0].getID(), +0.002);
+  }
+
+  // Append the tail's decorative branches
   //
   private appendTailBranch() {
     let tailBranch: DynamicList = new DynamicListPosed(
       this.tail.getLast().getPosition(),
-      new Vector(-1.5 * this.position.areal, 0.0),
-      Math.PI * 5.0,
+      new Vector(+0.4 * this.position.areal, 0.0),
+      Math.PI * 1.0,
       this.renderer,
       GameObjectCreature.rendererImageTail,
       GameObjectCreature.ratioTail );
@@ -185,12 +222,7 @@ class GameObjectCreature implements GameObject {
     }
 
     // Update position and rotation
-    //
     this.position.set( Vector.plus(this.position, Vector.scale(this.velocity, this.speedLinear*dt)) );
-
-    this.renderer.position( this.id, this.position );
-    this.renderer.rotation( this.id, this.velocity.angle() );
-
     this.tail.follow(this.position, this.speedLinear, dt);
   }
 
@@ -208,7 +240,6 @@ class GameObjectCreature implements GameObject {
   // Remove the creature
   //
   remove(): void {
-    this.renderer.remove(this.id, true);
   }
 
   // Perceive another object

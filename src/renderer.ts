@@ -14,7 +14,7 @@
 // Renderer object types
 //
 enum RendererObjectType {
-  SPRITE, MODEL
+  SPRITE, SPRITE_PIVOT_RIGHT
 }
 
 // Renderer interface
@@ -94,13 +94,13 @@ class ThreeRenderer implements Renderer {
       this.renderer.setSize(this.width, this.height);
     });
 
-    var light1 = new THREE.DirectionalLight( 0xffffff, 0.8 );
+    /*var light1 = new THREE.DirectionalLight( 0xffffff, 0.8 );
     light1.position.set( -1.0, +1.0, 0.5 );
     this.scene.add( light1 );
 
     var light2 = new THREE.DirectionalLight( 0xffffff, 0.1 );
     light2.position.set( +1.0, -1.0, -0.5 );
-    this.scene.add( light2 );
+    this.scene.add( light2 );*/
 
     //this.renderer.setClearColor( new THREE.Color(255,255,255) );
 
@@ -116,26 +116,47 @@ class ThreeRenderer implements Renderer {
   // Add an object
   //
   add(type: RendererObjectType, file: string, position: Vector, w: number, h: number): number {
-    var obj = null;
+    let spriteMap: THREE.Texture = this.textureLoader.load( "assets/" + file );
+    spriteMap.magFilter = THREE.LinearFilter;
+    spriteMap.minFilter = THREE.LinearFilter;
 
-    if( type == RendererObjectType.SPRITE ) {
-      let spriteMap: THREE.Texture = this.textureLoader.load( "assets/" + file );
-      spriteMap.magFilter = THREE.LinearFilter;
-      spriteMap.minFilter = THREE.LinearFilter;
+    let spriteMaterial = new THREE.MeshBasicMaterial( { side: THREE.DoubleSide, color: 0xffffff, map: spriteMap, transparent: true, depthTest: false} );
+    let obj: THREE.Mesh;
 
+    if( type == RendererObjectType.SPRITE_PIVOT_RIGHT ) {
+      let bufferGeometry = new THREE.BufferGeometry()
+      let vertices = new Float32Array( [
+        -1.0, -0.5, 0.0,
+        +0.0, -0.5, 0.0,
+        +0.0, +0.5, 0.0,
 
-      var spriteMaterial = new THREE.MeshBasicMaterial( {color: 0xffffff, map: spriteMap, transparent: true, depthTest: false} );
-      var spriteGeometry = new THREE.PlaneBufferGeometry( 1.0, 1.0, 1, 1 );
+        +0.0, +0.5, 0.0,
+        -1.0, +0.5, 0.0,
+        -1.0, -0.5, 0.0
+      ]);
 
-      obj = new THREE.Mesh( spriteGeometry, spriteMaterial );
+      let uvs = new Float32Array( [
+        -0.0, -0.0,
+        +1.0, -0.0,
+        +1.0, +1.0,
+
+        +1.0, +1.0,
+        -0.0, +1.0,
+        -0.0, -0.0
+      ]);
+
+      bufferGeometry.addAttribute( 'position', new THREE.BufferAttribute(vertices, 3) );
+      bufferGeometry.addAttribute( 'uv', new THREE.BufferAttribute(uvs, 2) );
+      obj = new THREE.Mesh( bufferGeometry, spriteMaterial );
     }
-    else if( type == RendererObjectType.MODEL ) {
-      var modelGeometry = new THREE.SphereGeometry( 1.0, 32, 32 ); // TODO: Load model file
-      var modelMaterial = new THREE.MeshPhongMaterial( {color: 0xffaa00, emissive: 0x333300, depthTest: false, transparent: true} );
-
-      obj = new THREE.Mesh( modelGeometry, modelMaterial );
+    else if( type == RendererObjectType.SPRITE ) {
+      let planeBufferGeometry = new THREE.PlaneBufferGeometry( 1.0, 1.0, 1, 1 );
+      obj = new THREE.Mesh( planeBufferGeometry, spriteMaterial );
     }
-    else throw "Invalid renderer object type."
+    else {
+      console.log("Invalid renderer object type.");
+      return 0;
+    }
 
     obj.position.x = position.x;
     obj.position.y =  position.y;

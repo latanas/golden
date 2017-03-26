@@ -25,6 +25,10 @@ class DynamicListElastic extends DynamicList {
 
         this.position = new VectorAreal(v.x, v.y, position.areal);
         this.velocity = velocity.copy();
+
+        this.id = this.renderer.add(
+            RendererObjectType.SPRITE, image,
+            this.position, this.position.areal * imageRatio, this.position.areal );
     }
 
     copy(): DynamicList {
