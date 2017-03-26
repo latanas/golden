@@ -58,7 +58,10 @@ class DynamicListPosed extends DynamicList {
         this.angle += angleSign*Math.PI*2;
         angleDelta -= angleSign*Math.PI*2;
       }
-      this.angle = this.angle + angleDelta * this.angularSpeed * dt;
+      this.angle = this.angle + angleDelta * this.angularSpeed * dt
+
+      this.rot.rotation( -1.0*angleDelta );
+      this.rot.transform( this.velocity );
     }
     let transformedPose: Vector = this.pose.copy();
 
@@ -73,6 +76,9 @@ class DynamicListPosed extends DynamicList {
     // Propagate movement down the DynamicList
     if( this.getCount() > 1 ) {
         this.getNext().follow( this.position, speedFollow, dt );
+    }
+    for( let branch of this.branches ) {
+      branch.follow( this.position, speedFollow, dt );
     }
   }
 }

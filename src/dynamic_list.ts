@@ -172,6 +172,15 @@ abstract class DynamicList {
         this.next = null;
     }
 
+    // Truncate the branches
+    //
+    truncateBranches() {
+        for( let branch of this.branches ) {
+            this.renderer.remove(branch.id, false);
+        }
+        this.branches = new Array<DynamicList>();
+    }
+
     // Make a copy
     abstract copy(): DynamicList;
 

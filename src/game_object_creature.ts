@@ -95,6 +95,7 @@ class GameObjectCreature implements GameObject {
     );
     this.append( segments );
     this.appendHeadBranches();
+    this.appendBodyBranches();
 
     this.spawnPending = [];
   }
@@ -102,6 +103,8 @@ class GameObjectCreature implements GameObject {
   // Append body segments whilst preserving the tail
   //
   private append(n: number): void {
+    this.tail.getLast().truncateBranches();
+
     for( var i = 0; i < n; i++ ) {
       this.tail.append( 1, GameObjectCreature.rendererImageBody, GameObjectCreature.ratioBody );
     }
@@ -147,9 +150,36 @@ class GameObjectCreature implements GameObject {
 
     for(let element of headElements) {
       this.tail.appendBranch(element);
-      this.renderer.positionz(element.getID(), +0.001);
+      this.renderer.positionz(element.getID(), +0.002);
     }
-    this.renderer.positionz(headElements[0].getID(), +0.002);
+    this.renderer.positionz(headElements[0].getID(), +0.003)
+  }
+
+  // Append the decoraive branches to the body
+  //
+   private appendBodyBranches() {
+    let bodyElements: DynamicList[] = new Array<DynamicList>();
+
+    bodyElements.push( new DynamicListPosed(
+      new VectorAreal( this.position.x, this.position.y, this.position.areal * 1.5 ),
+      new Vector(0.0 * this.position.areal, +0.8 * this.position.areal),
+      Math.PI * 1.0,
+      this.renderer,
+      GameObjectCreature.rendererImageHeadElement1,
+      GameObjectCreature.ratioTail * 0.6 ));
+
+    bodyElements.push( new DynamicListPosed(
+      new VectorAreal( this.position.x, this.position.y, this.position.areal * 1.5 ),
+      new Vector(0.0 * this.position.areal, -0.8 * this.position.areal),
+      Math.PI * 1.0,
+      this.renderer,
+      GameObjectCreature.rendererImageHeadElement2,
+      GameObjectCreature.ratioTail * 0.6 ));
+
+      for(let element of bodyElements) {
+        this.tail.getLast().getPrevious().appendBranch(element);
+        this.renderer.positionz(element.getID(), -0.001);
+    }
   }
 
   // Append the tail's decorative branches
@@ -157,8 +187,8 @@ class GameObjectCreature implements GameObject {
   private appendTailBranch() {
     let tailBranch: DynamicList = new DynamicListPosed(
       this.tail.getLast().getPosition(),
-      new Vector(+0.4 * this.position.areal, 0.0),
-      Math.PI * 1.0,
+      new Vector(+0.0 * this.position.areal, 0.0),
+      Math.PI * 8.0,
       this.renderer,
       GameObjectCreature.rendererImageTail,
       GameObjectCreature.ratioTail );

@@ -16,7 +16,7 @@
 class GameObjectGlutton extends GameObjectCreature {
   private static readonly distanceMax:   number  = 5.0;
   private static readonly distanceEvade: number  = 0.3;
-  private static readonly matureLenght: number = 12;
+  private static readonly matureLenght: number = 15;
 
   // Performing evasive move
   private isEvasive: boolean;
@@ -28,7 +28,7 @@ class GameObjectGlutton extends GameObjectCreature {
                position:    VectorAreal  = new VectorAreal(0.0, 0.0, 0.01),
                speedLinear: number       = 0.15,
                speedTurn:   number       = 3.0,
-               segments:    number       = 3,
+               segments:    number       = 6,
                velocity:    Vector       = new Vector(1.0, 0.0) )
   {
     super( renderer, position, speedLinear, speedTurn, segments, velocity );
