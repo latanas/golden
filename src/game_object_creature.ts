@@ -125,7 +125,7 @@ class GameObjectCreature implements GameObject {
       GameObjectCreature.ratioHead ));
 
     headElements.push( new DynamicListPosed(
-      new VectorAreal( this.position.x, this.position.y, this.position.areal * 2.6 ),
+      new VectorAreal( this.position.x, this.position.y, this.position.areal * 2.0 ),
       new Vector(0.0 * this.position.areal, +1.0 * this.position.areal),
       Math.PI * 1.8,
       this.renderer,
@@ -133,7 +133,7 @@ class GameObjectCreature implements GameObject {
       GameObjectCreature.ratioTail * 0.6 ));
 
     headElements.push( new DynamicListPosed(
-      new VectorAreal( this.position.x, this.position.y, this.position.areal * 2.6 ),
+      new VectorAreal( this.position.x, this.position.y, this.position.areal * 2.0 ),
       new Vector(0.0 * this.position.areal, -1.0 * this.position.areal),
       Math.PI * 1.8,
       this.renderer,
