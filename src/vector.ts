@@ -32,8 +32,7 @@ class Vector{
   }
 
   public angle(): number {
-    var a: number = Math.atan2(this.y, this.x);
-    return a>=0 ? a : a + Math.PI*2;
+    return Math.atan2(this.y, this.x);
   }
 
   static plus(a: Vector, b: Vector): Vector {

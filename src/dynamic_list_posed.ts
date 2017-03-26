@@ -20,14 +20,18 @@ class DynamicListPosed extends DynamicList {
   private pose: Vector;
   private rot: Matrix = new Matrix();
 
-  constructor( position: VectorAreal, pose: Vector, renderer: Renderer, image: string, imageRatio: number ) {
+  private angularSpeed: number; // Rad per second
+  private angle: number = null;
+
+  constructor( position: VectorAreal, pose: Vector, angularSpeed: number, renderer: Renderer, image: string, imageRatio: number ) {
       super(position, new Vector(), renderer, image, imageRatio);
+      this.angularSpeed = angularSpeed;
       this.pose = pose.copy();
   }
 
   copy(): DynamicList {
     return new DynamicListPosed(
-      this.position, this.pose, this.renderer, this.image, this.imageRatio);
+      this.position, this.pose, this.angularSpeed, this.renderer, this.image, this.imageRatio);
   }
 
   follow( positionFollow: Vector, speedFollow: number, dt: number ): void {
@@ -37,15 +41,30 @@ class DynamicListPosed extends DynamicList {
     }
     this.velocity.set( this.getPrevious().getVelocity() );
 
+    if( this.angle == null ) {
+      this.angle = this.velocity.angle();
+    }
+    else {
+      let angleDelta: number = (this.velocity.angle() - this.angle);
+      let angleSign: number = angleDelta>=0? +1:-1;
+
+      // If the angle happens to be obtuse, we don't want to animate it the "long way",
+      // so just add 2 * Pi to make it sharp
+      if( angleSign*angleDelta >= Math.PI ) {
+        this.angle += angleSign*Math.PI*2;
+        angleDelta -= angleSign*Math.PI*2;
+      }
+      this.angle = this.angle + angleDelta * this.angularSpeed * dt;
+    }
     let transformedPose: Vector = this.pose.copy();
 
-    this.rot.rotation( this.velocity.angle() );
+    this.rot.rotation( this.angle );
     this.rot.transform( transformedPose );
 
     this.position.set( Vector.plus(positionFollow, transformedPose) );
 
     this.renderer.position( this.id, this.position );
-    this.renderer.rotation( this.id, this.velocity.angle() );
+    this.renderer.rotation( this.id, this.angle );
 
     // Propagate movement down the DynamicList
     if( this.getCount() > 1 ) {

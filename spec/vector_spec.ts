@@ -171,6 +171,6 @@ describe("Vector", () => {
     expect( v.angle() ).toBeCloseTo( Math.PI*0.6, 3 );
 
     v = new Vector( Math.cos(Math.PI*1.2), Math.sin(Math.PI*1.2) );
-    expect( v.angle() ).toBeCloseTo( Math.PI*1.2, 3 );
+    expect( v.angle() ).toBeCloseTo( Math.PI*1.2 - 2.0*Math.PI, 3 );
   });
 });

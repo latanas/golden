@@ -120,7 +120,8 @@ class GameObjectCreature implements GameObject {
   private appendTailBranch() {
     let tailBranch: DynamicList = new DynamicListPosed(
       this.tail.getLast().getPosition(),
-      new Vector(-1.50 * this.position.areal, 0.0),
+      new Vector(-1.5 * this.position.areal, 0.0),
+      Math.PI * 5.0,
       this.renderer,
       GameObjectCreature.rendererImageTail,
       GameObjectCreature.ratioTail );
