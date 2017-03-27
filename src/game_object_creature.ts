@@ -30,25 +30,13 @@ class GameObjectCreature implements GameObject {
   protected speedLinear: number;
   protected speedTurn:   number;
 
-  // Expandable tail
-  protected tail: DynamicList;
-
-  // Display parameters
+  // Renderer and graphic skin
   //
   protected renderer: Renderer;
+  protected skin: Skin;
 
-  private static readonly rendererImageHead: string        = "headElement0.png";
-  private static readonly rendererImageWingLeft: string    = "headElement1.png";
-  private static readonly rendererImageWingRight: string   = "headElement2.png";
-  private static readonly rendererImageWingCenter: string  = "headElement3.png";
-  private static readonly rendererImageEye: string         = "headElement4.png";
-
-  private static readonly rendererImageBody: string = "body.png";
-  private static readonly rendererImageTail: string = "tail.png";
-
-  private static readonly ratioHead : number = 2.0;
-  private static readonly ratioBody : number = 2.3;
-  private static readonly ratioTail : number = 3.0;
+  // The creature's body is stored in DynamicList
+  protected tail: DynamicList;
 
   // Animation parameters
   //
@@ -88,138 +76,16 @@ class GameObjectCreature implements GameObject {
     this.turnDirection = +1;
 
     this.renderer = renderer;
-    this.tail = new DynamicListElastic(
-        this.position, this.velocity,
-        renderer,
-        GameObjectCreature.rendererImageBody,
-        GameObjectCreature.ratioBody
-    );
-    this.append( segments );
-    this.appendHeadBranches();
-    this.appendBodyBranches();
+    this.skin = new SkinDragon( renderer );
+    this.tail = this.skin.create( this.position, this.velocity, segments );
 
     this.spawnPending = [];
-  }
-
-  // Append body segments whilst preserving the tail
-  //
-  private append(n: number): void {
-    this.tail.getLast().truncateBranches();
-
-    for( var i = 0; i < n; i++ ) {
-      this.tail.append( 1, GameObjectCreature.rendererImageBody, GameObjectCreature.ratioBody );
-    }
-    this.appendTailBranch();
-  }
-
-  // Append the head's decoraive branches
-  //
-  private appendHeadBranches() {
-    let headElements: DynamicList[] = new Array<DynamicList>();
-
-    headElements.push( new DynamicListPosed(
-      new VectorAreal( this.position.x, this.position.y, this.position.areal * 2.0 ),
-      new Vector(+1.8 * this.position.areal, +0.0 * this.position.areal),
-      Math.PI * 6.0,
-      this.renderer,
-      GameObjectCreature.rendererImageHead,
-      GameObjectCreature.ratioHead ));
-
-    headElements.push( new DynamicListPosed(
-      new VectorAreal( this.position.x, this.position.y, this.position.areal * 0.1 ),
-      new Vector(+0.75 * this.position.areal, +0.31 * this.position.areal),
-      Math.PI * 6.0,
-      this.renderer,
-      GameObjectCreature.rendererImageEye,
-      1.0, RendererObjectType.SPHERE ));
-
-    headElements.push( new DynamicListPosed(
-      new VectorAreal( this.position.x, this.position.y, this.position.areal * 0.1 ),
-      new Vector(+0.75 * this.position.areal, -0.31 * this.position.areal),
-      Math.PI * 6.0,
-      this.renderer,
-      GameObjectCreature.rendererImageEye,
-      1.0, RendererObjectType.SPHERE ));
-
-    headElements.push( new DynamicListPosed(
-      new VectorAreal( this.position.x, this.position.y, this.position.areal * 2.0 ),
-      new Vector(0.0 * this.position.areal, +1.0 * this.position.areal),
-      Math.PI * 1.8,
-      this.renderer,
-      GameObjectCreature.rendererImageWingLeft,
-      GameObjectCreature.ratioTail * 0.6 ));
-
-    headElements.push( new DynamicListPosed(
-      new VectorAreal( this.position.x, this.position.y, this.position.areal * 2.0 ),
-      new Vector(0.0 * this.position.areal, -1.0 * this.position.areal),
-      Math.PI * 1.8,
-      this.renderer,
-      GameObjectCreature.rendererImageWingRight,
-      GameObjectCreature.ratioTail * 0.6 ));
-
-    headElements.push( new DynamicListPosed(
-      new VectorAreal( this.position.x, this.position.y, this.position.areal * 0.5 ),
-      new Vector(+0.0 * this.position.areal, +0.0 * this.position.areal),
-      Math.PI * 2.5,
-      this.renderer,
-      GameObjectCreature.rendererImageWingCenter,
-      GameObjectCreature.ratioTail * 1.4 ));
-
-    for(let element of headElements) {
-      this.tail.appendBranch(element);
-      this.renderer.positionz(element.getID(), +0.002);
-    }
-    this.renderer.positionz(headElements[0].getID(), +0.003)
-    this.renderer.positionz(headElements[1].getID(), this.position.areal * 0.05 + 0.003)
-    this.renderer.positionz(headElements[2].getID(), this.position.areal * 0.05 + 0.003)
-  }
-
-  // Append the decoraive branches to the body
-  //
-   private appendBodyBranches() {
-    let bodyElements: DynamicList[] = new Array<DynamicList>();
-
-    bodyElements.push( new DynamicListPosed(
-      new VectorAreal( this.position.x, this.position.y, this.position.areal * 1.5 ),
-      new Vector(0.0 * this.position.areal, +0.8 * this.position.areal),
-      Math.PI * 1.0,
-      this.renderer,
-      GameObjectCreature.rendererImageWingLeft,
-      GameObjectCreature.ratioTail * 0.6 ));
-
-    bodyElements.push( new DynamicListPosed(
-      new VectorAreal( this.position.x, this.position.y, this.position.areal * 1.5 ),
-      new Vector(0.0 * this.position.areal, -0.8 * this.position.areal),
-      Math.PI * 1.0,
-      this.renderer,
-      GameObjectCreature.rendererImageWingRight,
-      GameObjectCreature.ratioTail * 0.6 ));
-
-      for(let element of bodyElements) {
-        this.tail.getLast().getPrevious().appendBranch(element);
-        this.renderer.positionz(element.getID(), -0.001);
-    }
-  }
-
-  // Append the tail's decorative branches
-  //
-  private appendTailBranch() {
-    let tailBranch: DynamicList = new DynamicListPosed(
-      this.tail.getLast().getPosition(),
-      new Vector(+0.0 * this.position.areal, 0.0),
-      Math.PI * 8.0,
-      this.renderer,
-      GameObjectCreature.rendererImageTail,
-      GameObjectCreature.ratioTail );
-
-    this.tail.getLast().appendBranch(tailBranch);
-    this.renderer.positionz(tailBranch.getID(), -0.001);
   }
 
   // Creature eats a consumable
   //
   eat( consumable: GameObjectConsumable ) {
-    this.append(consumable.consume());
+    this.skin.append( this.tail, consumable.consume() );
   }
 
   // Animate the creature
@@ -266,7 +132,7 @@ class GameObjectCreature implements GameObject {
 
         if( nearest.getPosition().isIntersected(this.position) ) {
           nearest.getPrevious().truncate();
-          this.appendTailBranch();
+          this.skin.append( this.tail, 0 );
         }
     }
 
