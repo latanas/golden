@@ -37,10 +37,11 @@ class GameObjectCreature implements GameObject {
   //
   protected renderer: Renderer;
 
-  private static readonly rendererImageHead: string = "headElement0.png";
-  private static readonly rendererImageHeadElement1: string = "headElement1.png";
-  private static readonly rendererImageHeadElement2: string = "headElement2.png";
-  private static readonly rendererImageHeadElement3: string = "headElement3.png";
+  private static readonly rendererImageHead: string        = "headElement0.png";
+  private static readonly rendererImageWingLeft: string    = "headElement1.png";
+  private static readonly rendererImageWingRight: string   = "headElement2.png";
+  private static readonly rendererImageWingCenter: string  = "headElement3.png";
+  private static readonly rendererImageEye: string         = "headElement4.png";
 
   private static readonly rendererImageBody: string = "body.png";
   private static readonly rendererImageTail: string = "tail.png";
@@ -125,11 +126,27 @@ class GameObjectCreature implements GameObject {
       GameObjectCreature.ratioHead ));
 
     headElements.push( new DynamicListPosed(
+      new VectorAreal( this.position.x, this.position.y, this.position.areal * 0.1 ),
+      new Vector(+0.75 * this.position.areal, +0.31 * this.position.areal),
+      Math.PI * 6.0,
+      this.renderer,
+      GameObjectCreature.rendererImageEye,
+      1.0, RendererObjectType.SPHERE ));
+
+    headElements.push( new DynamicListPosed(
+      new VectorAreal( this.position.x, this.position.y, this.position.areal * 0.1 ),
+      new Vector(+0.75 * this.position.areal, -0.31 * this.position.areal),
+      Math.PI * 6.0,
+      this.renderer,
+      GameObjectCreature.rendererImageEye,
+      1.0, RendererObjectType.SPHERE ));
+
+    headElements.push( new DynamicListPosed(
       new VectorAreal( this.position.x, this.position.y, this.position.areal * 2.0 ),
       new Vector(0.0 * this.position.areal, +1.0 * this.position.areal),
       Math.PI * 1.8,
       this.renderer,
-      GameObjectCreature.rendererImageHeadElement1,
+      GameObjectCreature.rendererImageWingLeft,
       GameObjectCreature.ratioTail * 0.6 ));
 
     headElements.push( new DynamicListPosed(
@@ -137,7 +154,7 @@ class GameObjectCreature implements GameObject {
       new Vector(0.0 * this.position.areal, -1.0 * this.position.areal),
       Math.PI * 1.8,
       this.renderer,
-      GameObjectCreature.rendererImageHeadElement2,
+      GameObjectCreature.rendererImageWingRight,
       GameObjectCreature.ratioTail * 0.6 ));
 
     headElements.push( new DynamicListPosed(
@@ -145,7 +162,7 @@ class GameObjectCreature implements GameObject {
       new Vector(+0.0 * this.position.areal, +0.0 * this.position.areal),
       Math.PI * 2.5,
       this.renderer,
-      GameObjectCreature.rendererImageHeadElement3,
+      GameObjectCreature.rendererImageWingCenter,
       GameObjectCreature.ratioTail * 1.4 ));
 
     for(let element of headElements) {
@@ -153,6 +170,8 @@ class GameObjectCreature implements GameObject {
       this.renderer.positionz(element.getID(), +0.002);
     }
     this.renderer.positionz(headElements[0].getID(), +0.003)
+    this.renderer.positionz(headElements[1].getID(), this.position.areal * 0.05 + 0.003)
+    this.renderer.positionz(headElements[2].getID(), this.position.areal * 0.05 + 0.003)
   }
 
   // Append the decoraive branches to the body
@@ -165,7 +184,7 @@ class GameObjectCreature implements GameObject {
       new Vector(0.0 * this.position.areal, +0.8 * this.position.areal),
       Math.PI * 1.0,
       this.renderer,
-      GameObjectCreature.rendererImageHeadElement1,
+      GameObjectCreature.rendererImageWingLeft,
       GameObjectCreature.ratioTail * 0.6 ));
 
     bodyElements.push( new DynamicListPosed(
@@ -173,7 +192,7 @@ class GameObjectCreature implements GameObject {
       new Vector(0.0 * this.position.areal, -0.8 * this.position.areal),
       Math.PI * 1.0,
       this.renderer,
-      GameObjectCreature.rendererImageHeadElement2,
+      GameObjectCreature.rendererImageWingRight,
       GameObjectCreature.ratioTail * 0.6 ));
 
       for(let element of bodyElements) {

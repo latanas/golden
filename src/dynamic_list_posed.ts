@@ -23,13 +23,16 @@ class DynamicListPosed extends DynamicList {
   private angularSpeed: number; // Rad per second
   private angle: number = null;
 
-  constructor( position: VectorAreal, pose: Vector, angularSpeed: number, renderer: Renderer, image: string, imageRatio: number ) {
+  constructor( position: VectorAreal, pose: Vector, angularSpeed: number,
+               renderer: Renderer, image: string, imageRatio: number,
+               type: RendererObjectType = RendererObjectType.SPRITE_PIVOT_RIGHT ) {
+
       super(position, new Vector(), renderer, image, imageRatio);
       this.angularSpeed = angularSpeed;
       this.pose = pose.copy();
 
       this.id = this.renderer.add(
-            RendererObjectType.SPRITE_PIVOT_RIGHT, image,
+            type, image,
             this.position, this.position.areal * imageRatio, this.position.areal );
   }
 

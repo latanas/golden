@@ -14,7 +14,7 @@
 // Renderer object types
 //
 enum RendererObjectType {
-  SPRITE, SPRITE_PIVOT_RIGHT
+  SPRITE, SPRITE_PIVOT_RIGHT, SPHERE
 }
 
 // Renderer interface
@@ -59,6 +59,8 @@ class ThreeRenderer implements Renderer {
   private scene:    THREE.Scene;
   private textureLoader: THREE.TextureLoader;
 
+  private geometryBuffers = {};
+
   private fadeSpeed:   number;
   private fadeInList:  SlotList;
   private fadeOutList: SlotList;
@@ -94,21 +96,57 @@ class ThreeRenderer implements Renderer {
       this.renderer.setSize(this.width, this.height);
     });
 
-    /*var light1 = new THREE.DirectionalLight( 0xffffff, 0.8 );
+    let light1 = new THREE.DirectionalLight( 0xffffff, 0.8 );
     light1.position.set( -1.0, +1.0, 0.5 );
     this.scene.add( light1 );
 
-    var light2 = new THREE.DirectionalLight( 0xffffff, 0.1 );
+    let light2 = new THREE.DirectionalLight( 0xffffff, 0.1 );
     light2.position.set( +1.0, -1.0, -0.5 );
-    this.scene.add( light2 );*/
+    this.scene.add( light2 );
 
-    //this.renderer.setClearColor( new THREE.Color(255,255,255) );
+    //this.renderer.setClearColor( new THREE.Color(155,155,155) );
 
     this.fadeSpeed    = 1.5;
     this.fadeInList   = new SlotList();
     this.fadeOutList  = new SlotList();
+
+    this.createGeometryBuffers();
   }
 
+  // Geometry to be instantiated by objects
+  //
+  private createGeometryBuffers() {
+    let spriteGeometry    = new THREE.PlaneBufferGeometry( 1.0, 1.0, 1, 1 );
+    let spritePivotRight  = new THREE.BufferGeometry();
+    let sphereGeometry    = new THREE.SphereBufferGeometry(1.0, 6, 6);
+
+    let vertices = new Float32Array( [
+        -1.0, -0.5, 0.0,
+        +0.0, -0.5, 0.0,
+        +0.0, +0.5, 0.0,
+
+        +0.0, +0.5, 0.0,
+        -1.0, +0.5, 0.0,
+        -1.0, -0.5, 0.0 ]);
+    let uvs = new Float32Array( [
+        -0.0, -0.0,
+        +1.0, -0.0,
+        +1.0, +1.0,
+
+        +1.0, +1.0,
+        -0.0, +1.0,
+        -0.0, -0.0 ]);
+
+    spritePivotRight.addAttribute( 'position', new THREE.BufferAttribute(vertices, 3) );
+    spritePivotRight.addAttribute( 'uv', new THREE.BufferAttribute(uvs, 2) );
+
+    this.geometryBuffers[RendererObjectType.SPRITE] = spriteGeometry;
+    this.geometryBuffers[RendererObjectType.SPRITE_PIVOT_RIGHT] = spritePivotRight;
+    this.geometryBuffers[RendererObjectType.SPHERE] = sphereGeometry;
+  }
+
+  // Get an object by id
+  //
   private get(id: number): THREE.Object3D {
       return this.scene.getObjectById(id);
   }
@@ -120,43 +158,21 @@ class ThreeRenderer implements Renderer {
     spriteMap.magFilter = THREE.LinearFilter;
     spriteMap.minFilter = THREE.LinearFilter;
 
-    let spriteMaterial = new THREE.MeshBasicMaterial( { side: THREE.DoubleSide, color: 0xffffff, map: spriteMap, transparent: true, depthTest: false} );
-    let obj: THREE.Mesh;
+    let material: THREE.Material;
 
-    if( type == RendererObjectType.SPRITE_PIVOT_RIGHT ) {
-      let bufferGeometry = new THREE.BufferGeometry()
-      let vertices = new Float32Array( [
-        -1.0, -0.5, 0.0,
-        +0.0, -0.5, 0.0,
-        +0.0, +0.5, 0.0,
-
-        +0.0, +0.5, 0.0,
-        -1.0, +0.5, 0.0,
-        -1.0, -0.5, 0.0
-      ]);
-
-      let uvs = new Float32Array( [
-        -0.0, -0.0,
-        +1.0, -0.0,
-        +1.0, +1.0,
-
-        +1.0, +1.0,
-        -0.0, +1.0,
-        -0.0, -0.0
-      ]);
-
-      bufferGeometry.addAttribute( 'position', new THREE.BufferAttribute(vertices, 3) );
-      bufferGeometry.addAttribute( 'uv', new THREE.BufferAttribute(uvs, 2) );
-      obj = new THREE.Mesh( bufferGeometry, spriteMaterial );
-    }
-    else if( type == RendererObjectType.SPRITE ) {
-      let planeBufferGeometry = new THREE.PlaneBufferGeometry( 1.0, 1.0, 1, 1 );
-      obj = new THREE.Mesh( planeBufferGeometry, spriteMaterial );
+    if( type == RendererObjectType.SPHERE ) {
+      material = new THREE.MeshStandardMaterial({
+        color: 0x9acd66,
+        envMap: spriteMap,
+        emissive: new THREE.Color(0x5f9d4a),
+        metalness: 0.8,
+        roughness: 0.4} );
     }
     else {
-      console.log("Invalid renderer object type.");
-      return 0;
+      material = new THREE.MeshBasicMaterial( { side: THREE.DoubleSide, color: 0xffffff, map: spriteMap, transparent: true} );
     }
+
+    let obj: THREE.Mesh = new THREE.Mesh( this.geometryBuffers[type], material );
 
     obj.position.x = position.x;
     obj.position.y =  position.y;
