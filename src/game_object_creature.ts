@@ -20,7 +20,7 @@
 
 // Creature in the game
 //
-class GameObjectCreature implements GameObject {
+abstract class GameObjectCreature implements GameObject {
   // Position and velocity vector
   protected position: VectorAreal;
   protected velocity: Vector;
@@ -76,11 +76,20 @@ class GameObjectCreature implements GameObject {
     this.turnDirection = +1;
 
     this.renderer = renderer;
-    this.skin = new SkinDragon( renderer );
+    this.skin = this.createNewSkin();
     this.tail = this.skin.create( this.position, this.velocity, segments );
 
     this.spawnPending = [];
   }
+
+  // Abstract methods
+  //
+  protected abstract createNewSkin(): Skin;
+
+  abstract isAlive();
+  abstract isPerceptive();
+  abstract getPreceiveDistance();
+  abstract perceive( another: GameObject );
 
   // Creature eats a consumable
   //
@@ -157,11 +166,6 @@ class GameObjectCreature implements GameObject {
   remove(): void {
   }
 
-  // Perceive another object
-  //
-  perceive( another: GameObject ): void {
-  }
-
   // Get head position
   //
   getPosition(): VectorAreal {
@@ -172,23 +176,5 @@ class GameObjectCreature implements GameObject {
   //
   getNearestPosition( position: Vector ) {
     return this.tail.getNearest(position).getPosition();
-  }
-
-  // Get perceive distance
-  //
-  getPreceiveDistance(): number {
-    return 0.0;
-  }
-
-  // Is object alive
-  //
-  isAlive() {
-    return true;
-  }
-
-  // Is object perceiving
-  //
-  isPerceptive() {
-    return false;
   }
 }

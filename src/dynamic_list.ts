@@ -20,19 +20,23 @@ abstract class DynamicList {
     protected renderer: Renderer;
     protected image: string;
     protected imageRatio: number;
+    protected imageColor: number
     protected id: number;
 
     protected next: DynamicList;
     protected prev: DynamicList;
     protected branches: DynamicList[];
 
-    constructor(position: VectorAreal, velocity: Vector, renderer: Renderer, image: string, imageRatio: number) {
+    constructor( position: VectorAreal, velocity: Vector, renderer: Renderer,
+                 image: string, imageRatio: number, imageColor: number ) {
+
         this.position = position.copy();
         this.velocity = velocity.copy();
 
         this.renderer = renderer;
         this.image = image;
         this.imageRatio = imageRatio;
+        this.imageColor = imageColor;
 
         this.next = null;
         this.prev = null;

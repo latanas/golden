@@ -39,6 +39,7 @@ class GameObjectConsumable implements GameObject {
     this.id = this.renderer.add(
       RendererObjectType.SPRITE,
       GameObjectConsumable.rendererImageFile,
+      0xffffff,
       this.position,
       position.areal * GameObjectConsumable.rendererImageRatio,
       position.areal

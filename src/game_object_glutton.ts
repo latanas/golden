@@ -18,6 +18,9 @@ class GameObjectGlutton extends GameObjectCreature {
   private static readonly distanceEvade: number  = 0.3;
   private static readonly matureLenght: number = 15;
 
+  private static readonly enemyColor: number = 0xffaaaa;
+  private static readonly enemyEyeColor: number = 0xaa0000;
+
   // Performing evasive move
   private isEvasive: boolean;
 
@@ -35,6 +38,10 @@ class GameObjectGlutton extends GameObjectCreature {
 
     this.isEvasive    = false;
     this.distanceMin  = GameObjectGlutton.distanceMax;
+  }
+
+  protected createNewSkin(): Skin {
+    return new SkinDragon( this.renderer, GameObjectGlutton.enemyColor, GameObjectGlutton.enemyEyeColor );
   }
 
   // Animate the glutton

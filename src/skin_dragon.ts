@@ -7,6 +7,8 @@
   http://www.atanaslaskov.com/golden/
 */
 
+/// <reference path="Skin.ts" />
+
 /// <reference path="dynamic_list_elastic.ts" />
 /// <reference path="dynamic_list_posed.ts" />
 /// <reference path="vector_areal.ts" />
@@ -27,9 +29,13 @@ class SkinDragon implements Skin {
   public static readonly ratioTail : number = 3.0;
 
   private renderer: Renderer;
+  private color: number;
+  private eyeColor: number;
 
-  constructor(renderer: Renderer) {
+  constructor(renderer: Renderer, color: number, eyeColor: number) {
     this.renderer = renderer;
+    this.color = color;
+    this.eyeColor = eyeColor;
   }
 
   // Create new skin and store it as DynamicList
@@ -69,7 +75,9 @@ class SkinDragon implements Skin {
       Math.PI * 6.0,
       this.renderer,
       SkinDragon.rendererImageHead,
-      SkinDragon.ratioHead ));
+      SkinDragon.ratioHead,
+      RendererObjectType.SPRITE_PIVOT_RIGHT,
+      0xffffff ));
 
     headElements.push( new DynamicListPosed(
       new VectorAreal( position.x, position.y, position.areal * 0.1 ),
@@ -77,7 +85,9 @@ class SkinDragon implements Skin {
       Math.PI * 6.0,
       this.renderer,
       SkinDragon.rendererImageEye,
-      1.0, RendererObjectType.SPHERE ));
+      1.0,
+      RendererObjectType.SPHERE,
+      this.eyeColor ));
 
     headElements.push( new DynamicListPosed(
       new VectorAreal( position.x, position.y, position.areal * 0.1 ),
@@ -85,7 +95,9 @@ class SkinDragon implements Skin {
       Math.PI * 6.0,
       this.renderer,
       SkinDragon.rendererImageEye,
-      1.0, RendererObjectType.SPHERE ));
+      1.0,
+      RendererObjectType.SPHERE,
+      this.eyeColor ));
 
     headElements.push( new DynamicListPosed(
       new VectorAreal( position.x, position.y, position.areal * 2.0 ),
@@ -93,7 +105,9 @@ class SkinDragon implements Skin {
       Math.PI * 1.8,
       this.renderer,
       SkinDragon.rendererImageWingLeft,
-      SkinDragon.ratioTail * 0.6 ));
+      SkinDragon.ratioTail * 0.6,
+      RendererObjectType.SPRITE_PIVOT_RIGHT,
+      this.color ));
 
     headElements.push( new DynamicListPosed(
       new VectorAreal( position.x, position.y, position.areal * 2.0 ),
@@ -101,7 +115,9 @@ class SkinDragon implements Skin {
       Math.PI * 1.8,
       this.renderer,
       SkinDragon.rendererImageWingRight,
-      SkinDragon.ratioTail * 0.6 ));
+      SkinDragon.ratioTail * 0.6,
+      RendererObjectType.SPRITE_PIVOT_RIGHT,
+      this.color ));
 
     headElements.push( new DynamicListPosed(
       new VectorAreal( position.x, position.y, position.areal * 0.5 ),
@@ -109,7 +125,9 @@ class SkinDragon implements Skin {
       Math.PI * 2.5,
       this.renderer,
       SkinDragon.rendererImageWingCenter,
-      SkinDragon.ratioTail * 1.4 ));
+      SkinDragon.ratioTail * 1.4,
+      RendererObjectType.SPRITE_PIVOT_RIGHT,
+      this.color ));
 
     for(let element of headElements) {
       dragonBody.appendBranch( element );
@@ -131,7 +149,9 @@ class SkinDragon implements Skin {
       Math.PI * 1.0,
       this.renderer,
       SkinDragon.rendererImageWingLeft,
-      SkinDragon.ratioTail * 0.6 ));
+      SkinDragon.ratioTail * 0.6,
+      RendererObjectType.SPRITE_PIVOT_RIGHT,
+      this.color ));
 
     bodyElements.push( new DynamicListPosed(
       new VectorAreal( position.x, position.y, position.areal * 1.5 ),
@@ -139,7 +159,9 @@ class SkinDragon implements Skin {
       Math.PI * 1.0,
       this.renderer,
       SkinDragon.rendererImageWingRight,
-      SkinDragon.ratioTail * 0.6 ));
+      SkinDragon.ratioTail * 0.6,
+      RendererObjectType.SPRITE_PIVOT_RIGHT,
+      this.color ));
 
     for( let element of bodyElements ) {
         dragonBody.getLast().getPrevious().appendBranch( element );
@@ -156,7 +178,9 @@ class SkinDragon implements Skin {
       Math.PI * 8.0,
       this.renderer,
       SkinDragon.rendererImageTail,
-      SkinDragon.ratioTail );
+      SkinDragon.ratioTail,
+      RendererObjectType.SPRITE_PIVOT_RIGHT,
+      this.color );
 
     dragonBody.getLast().appendBranch( tailBranch );
     this.renderer.positionz( tailBranch.getID(), -0.001 );

@@ -15,6 +15,9 @@ class GameObjectPlayer extends GameObjectCreature {
 
   private idMoveTarget: number;
 
+  private static readonly playerColor: number = 0xaaffaa;
+  private static readonly playerEyeColor: number = 0x11aa11;
+
   constructor( renderer:    Renderer,
                position:    VectorAreal  = new VectorAreal(0.0, 0.0, 0.02),
                speedLinear: number       = 0.2,
@@ -23,9 +26,9 @@ class GameObjectPlayer extends GameObjectCreature {
     super( renderer, position, speedLinear, speedTurn );
 
     this.idMoveTarget = this.renderer.add(
-        RendererObjectType.SPRITE, "circle.png",
-        new Vector(), 0.05, 0.05
-    );
+        RendererObjectType.SPRITE,
+        "circle.png", 0xffffff,
+        new Vector(), 0.05, 0.05 );
 
     this.target( new Vector() );
 
@@ -33,6 +36,10 @@ class GameObjectPlayer extends GameObjectCreature {
       var clickPosition: Vector = new Vector(e.clientX, e.clientY);
       this.target( renderer.unproject(clickPosition) );
     });
+  }
+
+  protected createNewSkin(): Skin {
+    return new SkinDragon( this.renderer, GameObjectPlayer.playerColor, GameObjectPlayer.playerEyeColor );
   }
 
   // Set the movement target

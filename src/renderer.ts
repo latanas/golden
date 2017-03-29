@@ -21,7 +21,7 @@ enum RendererObjectType {
 //
 interface Renderer {
   // Add an object
-  add(type: RendererObjectType, file: string, position: Vector, w: number, h: number): number;
+  add(type: RendererObjectType, file: string, color: number, position: Vector, w: number, h: number): number;
 
   // Remove an object
   remove(id: number, fadeOut: boolean);
@@ -153,7 +153,7 @@ class ThreeRenderer implements Renderer {
 
   // Add an object
   //
-  add(type: RendererObjectType, file: string, position: Vector, w: number, h: number): number {
+  add(type: RendererObjectType, file: string, color: number, position: Vector, w: number, h: number): number {
     let spriteMap: THREE.Texture = this.textureLoader.load( "assets/" + file );
     spriteMap.magFilter = THREE.LinearFilter;
     spriteMap.minFilter = THREE.LinearFilter;
@@ -162,14 +162,14 @@ class ThreeRenderer implements Renderer {
 
     if( type == RendererObjectType.SPHERE ) {
       material = new THREE.MeshStandardMaterial({
-        color: 0x9acd66,
+        color: color,
         envMap: spriteMap,
-        emissive: new THREE.Color(0x5f9d4a),
+        emissive: new THREE.Color(color),
         metalness: 0.8,
         roughness: 0.4} );
     }
     else {
-      material = new THREE.MeshBasicMaterial( { side: THREE.DoubleSide, color: 0xffffff, map: spriteMap, transparent: true} );
+      material = new THREE.MeshBasicMaterial( {side: THREE.DoubleSide, color: color, map: spriteMap, transparent: true} );
     }
 
     let obj: THREE.Mesh = new THREE.Mesh( this.geometryBuffers[type], material );

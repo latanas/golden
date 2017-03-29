@@ -18,8 +18,10 @@
 // and shrink as the velocity decreases.
 //
 class DynamicListElastic extends DynamicList {
-    constructor(position: VectorAreal, velocity: Vector, renderer: Renderer, image: string, imageRatio: number) {
-        super(position, velocity, renderer, image, imageRatio);
+    constructor( position: VectorAreal, velocity: Vector,
+                 renderer: Renderer, image: string, imageRatio: number ) {
+
+        super(position, velocity, renderer, image, imageRatio, 0xffffff);
 
         let v: Vector = Vector.minus( position, Vector.scale(velocity, position.areal) );
 
@@ -27,13 +29,13 @@ class DynamicListElastic extends DynamicList {
         this.velocity = velocity.copy();
 
         this.id = this.renderer.add(
-            RendererObjectType.SPRITE, image,
+            RendererObjectType.SPRITE, image, 0xffffff,
             this.position, this.position.areal * imageRatio, this.position.areal );
     }
 
     copy(): DynamicList {
         return new DynamicListElastic(
-            this.position, this.velocity, this.renderer, this.image, this.imageRatio);
+            this.position, this.velocity, this.renderer, this.image, this.imageRatio );
     }
 
     follow( positionFollow: Vector, speedFollow: number, dt: number ): void {
