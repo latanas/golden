@@ -71,7 +71,11 @@ class GameObjectPlayer extends GameObjectCreature {
   }
 
   private unprojectSnap( screenPos: Vector ): Vector {
-    let unprojectedVector = this.renderer.unproject( screenPos );
+    let doc   = document.documentElement;
+    let left  = window.pageXOffset || doc.scrollLeft;
+    let top   = window.pageYOffset || doc.scrollTop;
+
+    let unprojectedVector = this.renderer.unproject( Vector.plus(screenPos, new Vector(left, top)) );
     return this.renderer.grid().snap( unprojectedVector );
   }
 

@@ -75,31 +75,13 @@ class ThreeRenderer implements Renderer {
   // Construct renderer
   //
   constructor() {
-    this.width  = window.innerWidth;
-    this.height = window.innerHeight;
-    this.origin = new Vector(this.width/2.0, this.height/2.0);
+    this.createCanvasContext();
 
-    var c = document.createElement("canvas");
-    c.width  = this.width;
-    c.height = this.height;
-    document.body.appendChild(c);
-
-    this.renderer = new THREE.WebGLRenderer({ canvas: c, antialias: true });
     this.scene    = new THREE.Scene();
     this.camera   = new THREE.PerspectiveCamera( 50, this.width/this.height, 0.1, 1000 );
     this.textureLoader = new THREE.TextureLoader();
 
     this.camera.position.z = 1;
-
-    window.addEventListener('resize', (e) => {
-      this.width  = c.width = window.innerWidth;
-      this.height = c.height = window.innerHeight;
-      this.origin = new Vector(this.width/2.0, this.height/2.0);
-
-      this.camera.aspect = this.width/this.height;
-      this.camera.updateProjectionMatrix();
-      this.renderer.setSize(this.width, this.height);
-    });
 
     let light1 = new THREE.DirectionalLight( 0xffffff, 0.8 );
     light1.position.set( -1.0, +1.0, 0.5 );
@@ -116,6 +98,40 @@ class ThreeRenderer implements Renderer {
     this.fadeOutList  = new SlotList();
 
     this.createGeometryBuffers();
+  }
+
+  // Create the canvas
+  //
+  private createCanvasContext() {
+    this.width  = window.innerWidth;
+    this.height = window.innerHeight;
+    this.origin = new Vector(this.width/2.0, this.height/2.0);
+
+    let c = document.createElement("canvas");
+    c.width  = this.width;
+    c.height = this.height;
+    document.body.appendChild(c);
+
+    this.renderer = new THREE.WebGLRenderer({ canvas: c, antialias: true });
+
+    let canvasResizeLambda = (e) => {
+      let html = document.documentElement;
+      let w = html.clientWidth;
+      let h = html.clientHeight;
+
+      if( (w == this.width) && (h == this.height) ) {
+        return;
+      }
+      this.width = c.width = w;
+      this.height = c.height = h;
+      this.origin = new Vector(this.width/2.0, this.height/2.0);
+
+      this.camera.aspect = this.width/this.height;
+      this.camera.updateProjectionMatrix();
+      this.renderer.setSize(this.width, this.height);
+    };
+    window.addEventListener('resize', canvasResizeLambda);
+    window.addEventListener('orientationchange', canvasResizeLambda);
   }
 
   // Geometry to be instantiated by objects
