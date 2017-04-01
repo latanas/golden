@@ -30,7 +30,7 @@ class GameObjectPlayer extends GameObjectCreature {
     this.idMoveTarget = this.renderer.add(
         RendererObjectType.SPRITE,
         "circle.png", 0xffffff,
-        new Vector(), 0.05, 0.05 );
+        new Vector(), 0.1, 0.1 );
 
     this.target( new Vector() );
 
@@ -49,6 +49,7 @@ class GameObjectPlayer extends GameObjectCreature {
   private target(v: Vector) {
     this.moveTarget = v;
     this.renderer.position( this.idMoveTarget, this.moveTarget );
+    this.renderer.positionz( this.idMoveTarget, -0.5 );
   }
 
   // Animate the player

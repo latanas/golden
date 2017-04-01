@@ -237,10 +237,9 @@ abstract class DynamicList {
     if( this.destructionRequested ) {
       this.destructionTime += dt;
 
-      let scaleFactor =
-        Math.max(0.001, (this.destructionTimeMax - this.destructionTime) / this.destructionTimeMax );
+      let accel = 1.0 - (this.destructionTimeMax - this.destructionTime) / this.destructionTimeMax;
 
-      this.position.areal *= scaleFactor;
+      this.position.areal = Math.max(0.0001, this.position.areal - this.position.areal * accel * Math.sqrt(dt) );
       this.renderer.scale( this.id, this.position.areal );
     }
 

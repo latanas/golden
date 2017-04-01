@@ -19,7 +19,7 @@ class GameObjectEnemy extends GameObjectCreature implements Consumable {
   private static readonly distancePerceive: number     = 5.0;
   private static readonly distanceEvade: number        = 0.5;
   private static readonly matureLenght: number         = 14;
-  private static readonly destructionDuration: number  = 10.0;
+  private static readonly destructionDuration: number  = 1.0;
 
   // Performing evasive move
   private isEvasive: boolean;
@@ -111,7 +111,7 @@ class GameObjectEnemy extends GameObjectCreature implements Consumable {
     }
   }
 
-  // Glutton eats apples
+  // The glutton eats apples
   //
   eat( consumable: Consumable ) {
     super.eat(consumable);
