@@ -27,8 +27,8 @@ class GameObjectPlayer extends GameObjectCreature {
   {
     super( renderer, position, speedLinear, speedTurn );
 
-    this.moveTarget = new Vector();
-
+    // Selection markers to guide the player
+    //
     this.idMoveTarget = this.renderer.add(
         RendererObjectType.SPRITE,
         "rectangle.png", 0x00ff00,
@@ -45,13 +45,24 @@ class GameObjectPlayer extends GameObjectCreature {
 
     this.renderer.positionz( this.idHoverTarget, -0.0001 );
 
-    window.addEventListener('click', (e) => {
-      this.moveTarget = this.unprojectSnap(e);
+    // Control the player with mouse and touch events
+    //
+    window.addEventListener('click', (e: MouseEvent) => {
+      this.moveTarget = this.unprojectSnap( new Vector(e.clientX, e.clientY) );
       this.renderer.position( this.idMoveTarget, this.moveTarget );
+      this.renderer.position( this.idHoverTarget, this.moveTarget );
     });
 
-    window.addEventListener('mousemove', (e) => {
-      this.renderer.position( this.idHoverTarget, this.unprojectSnap(e) );
+    window.addEventListener('touchstart', (e: TouchEvent) => {
+      if( e.touches.length > 0 ) {
+        this.moveTarget = this.unprojectSnap( new Vector(e.touches[0].clientX, e.touches[0].clientY) );
+        this.renderer.position( this.idMoveTarget, this.moveTarget );
+        this.renderer.position( this.idHoverTarget, this.moveTarget );
+      }
+    });
+
+    window.addEventListener('mousemove', (e: MouseEvent) => {
+      this.renderer.position( this.idHoverTarget, this.unprojectSnap( new Vector(e.clientX, e.clientY) ) );
     });
   }
 
@@ -59,8 +70,8 @@ class GameObjectPlayer extends GameObjectCreature {
     return new SkinDragon( this.renderer, GameObjectPlayer.playerColor, GameObjectPlayer.playerEyeColor );
   }
 
-  private unprojectSnap(e: MouseEvent): Vector {
-    let unprojectedVector = this.renderer.unproject( new Vector(e.clientX, e.clientY) );
+  private unprojectSnap( screenPos: Vector ): Vector {
+    let unprojectedVector = this.renderer.unproject( screenPos );
     return this.renderer.grid().snap( unprojectedVector );
   }
 
