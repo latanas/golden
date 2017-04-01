@@ -45,7 +45,9 @@ class DynamicListPosed extends DynamicList {
       this.renderer, this.image, this.imageRatio, this.imageType, this.imageColor );
   }
 
-  follow( positionFollow: Vector, speedFollow: number, dt: number ): void {
+  // Follow another object
+  //
+  animate( positionFollow: Vector, speedFollow: number, dt: number ): void {
     if( !this.getPrevious() ) {
       console.log("Posed element needs a parent to follow.")
       return;
@@ -80,12 +82,7 @@ class DynamicListPosed extends DynamicList {
     this.renderer.position( this.id, this.position );
     this.renderer.rotation( this.id, this.angle );
 
-    // Propagate movement down the DynamicList
-    if( this.getCount() > 1 ) {
-        this.getNext().follow( this.position, speedFollow, dt );
-    }
-    for( let branch of this.branches ) {
-      branch.follow( this.position, speedFollow, dt );
-    }
+    // Call the parent
+    super.animate(this.position, speedFollow, dt);
   }
 }

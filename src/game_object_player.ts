@@ -8,6 +8,8 @@
 */
 
 /// <reference path="game_object_creature.ts" />
+/// <reference path="consumable.ts" />
+/// <reference path="skin_dragon.ts" />
 
 // Creature controlled by the player
 //
@@ -64,22 +66,16 @@ class GameObjectPlayer extends GameObjectCreature {
 
   // Perceive another object
   //
-  perceive( another: GameObject ): void {
-    if( another instanceof GameObjectConsumable ) {
-      this.eat(<GameObjectConsumable> another);
+  perceive( another: any ): void {
+    if( "consume" in another ) {
+      this.eat( another as Consumable );
     }
   }
 
   // Get perceive distance
   //
   getPreceiveDistance(): number {
-    return this.position.areal * 1.5;
-  }
-
-  // Is object alive
-  //
-  isAlive() {
-    return true;
+    return this.position.areal * 0.8;
   }
 
   // Is object perceiving

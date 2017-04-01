@@ -35,6 +35,9 @@ interface Renderer {
   // Rotate an object
   rotation(id: number, angle: number);
 
+  // Scale an object
+  scale(id: number, scale: number);
+
   // Unproject vector (Convert screen to scene vector)
   unproject(screenPosition: Vector): Vector;
 
@@ -50,8 +53,6 @@ interface Renderer {
 class ThreeRenderer implements Renderer {
   private width:   number;
   private height:  number;
-
-  private scale:   number;
   private origin:  Vector;
 
   private renderer: THREE.WebGLRenderer;
@@ -70,7 +71,6 @@ class ThreeRenderer implements Renderer {
   constructor() {
     this.width  = window.innerWidth;
     this.height = window.innerHeight;
-    this.scale  = Math.min(this.width, this.height);
     this.origin = new Vector(this.width/2.0, this.height/2.0);
 
     var c = document.createElement("canvas");
@@ -88,7 +88,6 @@ class ThreeRenderer implements Renderer {
     window.addEventListener('resize', (e) => {
       this.width  = c.width = window.innerWidth;
       this.height = c.height = window.innerHeight;
-      this.scale  = Math.min(this.width, this.height);
       this.origin = new Vector(this.width/2.0, this.height/2.0);
 
       this.camera.aspect = this.width/this.height;
@@ -225,6 +224,18 @@ class ThreeRenderer implements Renderer {
   rotation(id: number, angle: number) {
     var obj: THREE.Object3D = this.get(id);
     obj.rotation.z = angle;
+  }
+
+  // Scale an object
+  //
+  scale(id: number, scale: number) {
+    let obj: THREE.Object3D = this.get(id);
+
+    // Uniform scale preserves the ratio
+    let ratio = obj.scale.x / obj.scale.y;
+
+    obj.scale.x = scale * ratio;
+    obj.scale.y = scale;
   }
 
   // Unproject vector (Convert screen to scene vector)

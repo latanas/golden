@@ -12,7 +12,7 @@
 /// <reference path="vector_areal.ts" />
 
 /// <reference path="game_object_player.ts" />
-/// <reference path="game_object_glutton.ts" />
+/// <reference path="game_object_enemy.ts" />
 /// <reference path="game_object_factory.ts" />
 
 /// <reference path="slot_list.ts" />
@@ -34,9 +34,9 @@ class Game {
     this.objects = new SlotList([
       new GameObjectFactory( renderer ),
       new GameObjectPlayer( renderer, new VectorAreal(0.0, 0.4, 0.06) ),
-      new GameObjectGlutton( renderer, new VectorAreal(0.0, -0.4, 0.03) ),
-      new GameObjectGlutton( renderer, new VectorAreal(0.4, 0.0, 0.03) ),
-      new GameObjectGlutton( renderer, new VectorAreal(-0.4, -0.0, 0.03) )
+      new GameObjectEnemy( renderer, new VectorAreal(0.0, -0.4, 0.03) ),
+      new GameObjectEnemy( renderer, new VectorAreal(0.4, 0.0, 0.03) ),
+      new GameObjectEnemy( renderer, new VectorAreal(-0.4, -0.0, 0.03) )
     ]);
   }
 
@@ -85,13 +85,17 @@ class Game {
   //
   perceive(obj: GameObject, id: number)
   {
-    var pos: Vector = obj.getPosition();
+    let pos: Vector = obj.getPosition();
 
     this.objects.each( (objPercept: GameObject, k:number) => {
       if( (id == k) || !objPercept ) return;
 
-      var d: number = Vector.minus( pos, objPercept.getPosition() ).distance();
-      if( d < obj.getPreceiveDistance() ) obj.perceive( objPercept );
+      let distance: number =
+        Vector.minus( pos, objPercept.getNearestPosition(pos) ).distance();
+
+      if( distance < obj.getPreceiveDistance() ) {
+        obj.perceive( objPercept );
+      }
     });
   }
 

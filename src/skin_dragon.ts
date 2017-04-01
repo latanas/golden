@@ -141,6 +141,9 @@ class SkinDragon implements Skin {
   // Append the decoraive branches to the body
   //
   private appendBodyBranches( dragonBody: DynamicList, position: VectorAreal ) {
+    if( dragonBody.isDestructionRequested() ) {
+      return;
+    }
     let bodyElements: DynamicList[] = new Array<DynamicList>();
 
     bodyElements.push( new DynamicListPosed(
@@ -172,6 +175,9 @@ class SkinDragon implements Skin {
   // Append the tail's decorative branches
   //
   private appendTailBranch( dragonBody: DynamicList ) {
+    if( dragonBody.isDestructionRequested() ) {
+      return;
+    }
     let tailBranch: DynamicList = new DynamicListPosed(
       dragonBody.getLast().getPosition(),
       new Vector( +0.0 * dragonBody.getLast().getPosition().areal, 0.0 ),

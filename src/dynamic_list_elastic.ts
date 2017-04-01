@@ -38,7 +38,7 @@ class DynamicListElastic extends DynamicList {
             this.position, this.velocity, this.renderer, this.image, this.imageRatio );
     }
 
-    follow( positionFollow: Vector, speedFollow: number, dt: number ): void {
+    animate( positionFollow: Vector, speedFollow: number, dt: number ): void {
         let distanceDelta          = Vector.minus( positionFollow, this.position ).distance();
         let elasticitySpeed        = Math.max(-1.0, Math.min(1.0, distanceDelta-this.position.areal))*speedFollow*3.5;
         let distanceAdjustedSpeed  = speedFollow + elasticitySpeed;
@@ -49,14 +49,7 @@ class DynamicListElastic extends DynamicList {
         this.renderer.position( this.id, this.position );
         this.renderer.rotation( this.id, this.velocity.angle() );
 
-        // Propagate movement down the DynamicList
-        if( this.next ) {
-            this.next.follow( this.position, distanceAdjustedSpeed, dt );
-        }
-
-        // Propagate movement to branches
-        for( let branch of this.branches ) {
-            branch.follow( this.position, distanceAdjustedSpeed, dt );
-        }
+        // Call the parent
+        super.animate(this.position, distanceAdjustedSpeed, dt);
     }
 }

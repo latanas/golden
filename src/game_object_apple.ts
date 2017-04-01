@@ -7,13 +7,16 @@
   http://www.atanaslaskov.com/golden/
 */
 
+
+/// <reference path="game_object.ts" />
+/// <reference path="consumable.ts" />
+
 /// <reference path="vector.ts" />
 /// <reference path="renderer.ts" />
-/// <reference path="game_object.ts" />
 
-// Object consumable by the player's dragon
+// Apples are consumable by the player's dragon (and also by enemy creatures).
 //
-class GameObjectConsumable implements GameObject {
+class GameObjectApple implements GameObject, Consumable {
   private position: VectorAreal;
   private velocity: Vector;
 
@@ -38,17 +41,17 @@ class GameObjectConsumable implements GameObject {
     this.renderer = renderer;
     this.id = this.renderer.add(
       RendererObjectType.SPRITE,
-      GameObjectConsumable.rendererImageFile,
+      GameObjectApple.rendererImageFile,
       0xffffff,
       this.position,
-      position.areal * GameObjectConsumable.rendererImageRatio,
-      position.areal
+      position.areal * GameObjectApple.rendererImageRatio * 0.7,
+      position.areal * 0.7
     );
 
     this.value = value;
   }
 
-  // Animate the consumable
+  // Animate the apple
   //
   animate(dt: number): void {
     this.swing += dt * 3.0;
@@ -85,6 +88,12 @@ class GameObjectConsumable implements GameObject {
   // Get position
   //
   getPosition(): VectorAreal {
+    return this.position;
+  }
+
+  // Get nearest position
+  //
+  getNearestPosition( position: Vector ): VectorAreal {
     return this.position;
   }
 

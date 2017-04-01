@@ -11,12 +11,13 @@
 /// <reference path="matrix.ts" />
 
 /// <reference path="renderer.ts" />
+/// <reference path="skin.ts" />
 
 /// <reference path="dynamic_list_elastic.ts" />
 /// <reference path="dynamic_list_posed.ts" />
 
 /// <reference path="game_object.ts" />
-/// <reference path="game_object_consumable.ts" />
+/// <reference path="consumable.ts" />
 
 // Creature in the game
 //
@@ -86,14 +87,19 @@ abstract class GameObjectCreature implements GameObject {
   //
   protected abstract createNewSkin(): Skin;
 
-  abstract isAlive();
   abstract isPerceptive();
   abstract getPreceiveDistance();
-  abstract perceive( another: GameObject );
+  abstract perceive( another: any );
+
+  // Is object alive
+  //
+  isAlive() {
+    return this.tail.getCount() > 1;
+  }
 
   // Creature eats a consumable
   //
-  eat( consumable: GameObjectConsumable ) {
+  eat( consumable: Consumable ) {
     this.skin.append( this.tail, consumable.consume() );
   }
 
@@ -147,7 +153,7 @@ abstract class GameObjectCreature implements GameObject {
 
     // Update position and rotation
     this.position.set( Vector.plus(this.position, Vector.scale(this.velocity, this.speedLinear*dt)) );
-    this.tail.follow(this.position, this.speedLinear, dt);
+    this.tail.animate( this.position, this.speedLinear, dt );
   }
 
   // Spawn new objects
@@ -164,6 +170,9 @@ abstract class GameObjectCreature implements GameObject {
   // Remove the creature
   //
   remove(): void {
+    this.tail.truncate();
+    this.tail.truncateBranches();
+    this.renderer.remove(this.tail.getID(), false);
   }
 
   // Get head position
@@ -174,7 +183,7 @@ abstract class GameObjectCreature implements GameObject {
 
   // Get nearest position in the tail
   //
-  getNearestPosition( position: Vector ) {
+  getNearestPosition( position: Vector ): VectorAreal {
     return this.tail.getNearest(position).getPosition();
   }
 }

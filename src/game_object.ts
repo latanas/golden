@@ -14,11 +14,12 @@
 //
 interface GameObject {
   animate( dt: number ): void;
-  perceive( another: GameObject ): void;
+  perceive( another: any ): void;
   spawn(): GameObject[];
   remove(): void;
 
   getPosition(): VectorAreal;
+  getNearestPosition( position: Vector );
   getPreceiveDistance(): number;
 
   isAlive(): boolean;

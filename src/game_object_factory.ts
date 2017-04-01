@@ -12,7 +12,7 @@
 /// <reference path="renderer.ts" />
 
 /// <reference path="game_object.ts" />
-/// <reference path="game_object_consumable.ts" />
+/// <reference path="game_object_apple.ts" />
 
 // Watch game objects and manufacture new ones as needed
 //
@@ -40,7 +40,7 @@ class GameObjectFactory implements GameObject {
 
   private makeConsumable(): GameObject {
     var position = new VectorAreal( (Math.random()-0.5) * 0.8, (Math.random()-0.5) * 0.8, 0.1 );
-    return new GameObjectConsumable( this.renderer, position );
+    return new GameObjectApple( this.renderer, position );
   }
 
   private factory() {
@@ -63,8 +63,8 @@ class GameObjectFactory implements GameObject {
 
   // Perceive objects
   //
-  perceive( another: GameObject ): void {
-    if( another instanceof GameObjectConsumable ) {
+  perceive( another: any ): void {
+    if( another instanceof GameObjectApple ) {
       this.countConsumables++;
     }
   }
@@ -84,6 +84,7 @@ class GameObjectFactory implements GameObject {
   // Position at the centre of gameplay area, and percieve the entire area
   //
   getPosition(): VectorAreal { return new VectorAreal(); }
+  getNearestPosition(): VectorAreal { return new VectorAreal(); }
   getPreceiveDistance(): number { return 1.0; }
 
   // Always alive and perceiving
