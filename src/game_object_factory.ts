@@ -39,8 +39,9 @@ class GameObjectFactory implements GameObject {
   }
 
   private makeConsumable(): GameObject {
-    var position = new VectorAreal( (Math.random()-0.5) * 0.8, (Math.random()-0.5) * 0.8, 0.1 );
-    return new GameObjectApple( this.renderer, position );
+    let positionRandom: Vector = new Vector((Math.random()-0.5) * 0.8, (Math.random()-0.5) * 0.8);
+    let positionSnap: Vector = this.renderer.grid().snap( positionRandom );
+    return new GameObjectApple( this.renderer, new VectorAreal(positionSnap.x, positionSnap.y, 0.1) );
   }
 
   private factory() {

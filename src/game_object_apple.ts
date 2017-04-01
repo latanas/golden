@@ -34,7 +34,7 @@ class GameObjectApple implements GameObject, Consumable {
                value:    number       = 1.0)
   {
     this.position = position;
-    this.velocity = new Vector();
+    this.velocity = new Vector(0.0, 0.05);
 
     this.swing = Math.random()*Math.PI;
 
@@ -55,8 +55,8 @@ class GameObjectApple implements GameObject, Consumable {
   //
   animate(dt: number): void {
     this.swing += dt * 3.0;
-    this.position.x += this.velocity.x*dt;
-    this.position.y += this.velocity.x*dt + Math.sin( this.swing )*0.001;
+    this.position.x += Math.cos( this.swing )*this.velocity.x*dt;
+    this.position.y += Math.sin( this.swing )*this.velocity.y*dt;
 
     this.renderer.position( this.id, this.position );
   }

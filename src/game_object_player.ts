@@ -14,8 +14,8 @@
 // Creature controlled by the player
 //
 class GameObjectPlayer extends GameObjectCreature {
-
   private idMoveTarget: number;
+  private idHoverTarget: number;
 
   private static readonly playerColor: number = 0xaaffaa;
   private static readonly playerEyeColor: number = 0x11aa11;
@@ -27,16 +27,31 @@ class GameObjectPlayer extends GameObjectCreature {
   {
     super( renderer, position, speedLinear, speedTurn );
 
+    this.moveTarget = new Vector();
+
     this.idMoveTarget = this.renderer.add(
         RendererObjectType.SPRITE,
-        "circle.png", 0xffffff,
-        new Vector(), 0.1, 0.1 );
+        "rectangle.png", 0x00ff00,
+        new Vector(),
+        this.renderer.grid().getDimension().x,
+        this.renderer.grid().getDimension().y );
 
-    this.target( new Vector() );
+    this.idHoverTarget = this.renderer.add(
+        RendererObjectType.SPRITE,
+        "rectangle.png", 0xaaaaaa,
+        new Vector(),
+        this.renderer.grid().getDimension().x,
+        this.renderer.grid().getDimension().y );
+
+    this.renderer.positionz( this.idHoverTarget, -0.0001 );
 
     window.addEventListener('click', (e) => {
-      var clickPosition: Vector = new Vector(e.clientX, e.clientY);
-      this.target( renderer.unproject(clickPosition) );
+      this.moveTarget = this.unprojectSnap(e);
+      this.renderer.position( this.idMoveTarget, this.moveTarget );
+    });
+
+    window.addEventListener('mousemove', (e) => {
+      this.renderer.position( this.idHoverTarget, this.unprojectSnap(e) );
     });
   }
 
@@ -44,12 +59,9 @@ class GameObjectPlayer extends GameObjectCreature {
     return new SkinDragon( this.renderer, GameObjectPlayer.playerColor, GameObjectPlayer.playerEyeColor );
   }
 
-  // Set the movement target
-  //
-  private target(v: Vector) {
-    this.moveTarget = v;
-    this.renderer.position( this.idMoveTarget, this.moveTarget );
-    this.renderer.positionz( this.idMoveTarget, -0.5 );
+  private unprojectSnap(e: MouseEvent): Vector {
+    let unprojectedVector = this.renderer.unproject( new Vector(e.clientX, e.clientY) );
+    return this.renderer.grid().snap( unprojectedVector );
   }
 
   // Animate the player

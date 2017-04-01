@@ -10,6 +10,7 @@
 /// <reference path="../typings/globals/three/index.d.ts" />
 /// <reference path="vector.ts" />
 /// <reference path="slot_list.ts" />
+/// <reference path="grid.ts" />
 
 // Renderer object types
 //
@@ -20,6 +21,9 @@ enum RendererObjectType {
 // Renderer interface
 //
 interface Renderer {
+  // Get the grid
+  grid(): Grid;
+
   // Add an object
   add(type: RendererObjectType, file: string, color: number, position: Vector, w: number, h: number): number;
 
@@ -65,6 +69,8 @@ class ThreeRenderer implements Renderer {
   private fadeSpeed:   number;
   private fadeInList:  SlotList;
   private fadeOutList: SlotList;
+
+  private rendererGrid: Grid = new Grid( new Vector(0.1, 0.1) );
 
   // Construct renderer
   //
@@ -148,6 +154,12 @@ class ThreeRenderer implements Renderer {
   //
   private get(id: number): THREE.Object3D {
       return this.scene.getObjectById(id);
+  }
+
+  // Get the grid
+  //
+  public grid(): Grid {
+      return this.rendererGrid;
   }
 
   // Add an object
