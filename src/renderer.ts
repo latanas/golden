@@ -65,6 +65,7 @@ class ThreeRenderer implements Renderer {
   private textureLoader: THREE.TextureLoader;
 
   private geometryBuffers = {};
+  private textures = {};
 
   private fadeSpeed:   number;
   private fadeInList:  SlotList;
@@ -181,10 +182,12 @@ class ThreeRenderer implements Renderer {
   // Add an object
   //
   add(type: RendererObjectType, file: string, color: number, position: Vector, w: number, h: number): number {
-    let spriteMap: THREE.Texture = this.textureLoader.load( "assets/" + file );
-    spriteMap.magFilter = THREE.LinearFilter;
-    spriteMap.minFilter = THREE.LinearFilter;
-
+    if( !(file in this.textures) ) {
+      this.textures[file] = this.textureLoader.load( "assets/" + file );
+      this.textures[file].magFilter = THREE.LinearFilter;
+      this.textures[file].minFilter = THREE.LinearFilter;
+    }
+    let spriteMap = this.textures[file];
     let material: THREE.Material;
 
     if( type == RendererObjectType.SPHERE ) {
