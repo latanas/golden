@@ -19,7 +19,7 @@ class GameObjectEnemy extends GameObjectCreature implements Consumable {
   private static readonly distancePerceive: number     = 5.0;
   private static readonly distanceEvade: number        = 0.5;
   private static readonly matureLenght: number         = 14;
-  private static readonly destructionDuration: number  = 3.0;
+  private static readonly destructionDuration: number  = 2.5;
 
   // Performing evasive move
   private isEvasive: boolean;

@@ -12,42 +12,48 @@
 /// <reference path="renderer.ts" />
 
 /// <reference path="game_object.ts" />
-/// <reference path="game_object_apple.ts" />
 
-// Watch game objects and manufacture new ones as needed
+// The factory counts game objects of certain type, and creates new objects when needed.
 //
-class GameObjectFactory implements GameObject {
-  private renderer: Renderer;
-  private pending: GameObject[];
+class GameObjectFactory<T extends GameObject> implements GameObject {
+  private factoryType: {new(r:Renderer, pos:VectorAreal): T};
 
-  private countConsumablesTarget: number;
-  private countConsumables: number;
+  private renderer: Renderer;
+
+  private countQuota: number;
+  private countPresent: number;
 
   private waitTimeMax: number;
   private waitTime: number;
 
-  constructor(renderer: Renderer) {
+  private scale: number;
+
+  private pending: GameObject[];
+
+  // Create the factory with the type e.g. GameObjectApple or GameObjectEnemy
+  //
+  constructor( renderer: Renderer,
+               factoryType: {new(r:Renderer, pos:VectorAreal): T},
+               quota: number = 1, timing: number = 1, scale = 0.1 ) {
+
     this.renderer = renderer;
+    this.factoryType = factoryType;
 
     this.pending = [];
 
-    this.countConsumablesTarget   = 3;
-    this.countConsumables         = 0;
+    this.countQuota    = quota;
+    this.countPresent  = 0;
 
-    this.waitTimeMax  = 3.0;
-    this.waitTime     = 0.0;
+    this.waitTimeMax  = timing;
+    this.waitTime     = timing;
+
+    this.scale = scale;
   }
 
-  private makeConsumable(): GameObject {
+  private createNewObject(): GameObject {
     let positionRandom: Vector = new Vector((Math.random()-0.5) * 0.8, (Math.random()-0.5) * 0.8);
     let positionSnap: Vector = this.renderer.grid().snap( positionRandom );
-    return new GameObjectApple( this.renderer, new VectorAreal(positionSnap.x, positionSnap.y, 0.1) );
-  }
-
-  private factory() {
-    if( this.countConsumables < this.countConsumablesTarget  ) {
-        this.pending.push( this.makeConsumable() );
-    }
+    return new this.factoryType( this.renderer, new VectorAreal(positionSnap.x, positionSnap.y, this.scale) );
   }
 
   // Animate the factory
@@ -57,16 +63,21 @@ class GameObjectFactory implements GameObject {
 
     if( this.waitTime <= 0 ) {
       this.waitTime = this.waitTimeMax;
-      this.factory();
+
+      if( this.countPresent < this.countQuota ) {
+        this.pending.push( this.createNewObject() );
+      }
     }
-    this.countConsumables = 0;
+    this.countPresent = 0;
   }
 
   // Perceive objects
   //
   perceive( another: any ): void {
-    if( another instanceof GameObjectApple ) {
-      this.countConsumables++;
+    let factoryTypeName = (<any> this.factoryType).name;
+
+    if( factoryTypeName == another.constructor.name ) {
+      this.countPresent++;
     }
   }
 

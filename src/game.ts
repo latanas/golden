@@ -32,11 +32,9 @@ class Game {
     this.isPaused = false;
 
     this.objects = new SlotList([
-      new GameObjectFactory( renderer ),
+      new GameObjectFactory( renderer, GameObjectApple, 3, 3.0, 0.1 ),
+      new GameObjectFactory( renderer, GameObjectEnemy, 3, 10.0, 0.03 ),
       new GameObjectPlayer( renderer, new VectorAreal(0.0, 0.4, 0.06) ),
-      new GameObjectEnemy( renderer, new VectorAreal(0.0, -0.4, 0.03) ),
-      new GameObjectEnemy( renderer, new VectorAreal(0.4, 0.0, 0.03) ),
-      new GameObjectEnemy( renderer, new VectorAreal(-0.4, -0.0, 0.03) )
     ]);
   }
 
